@@ -1,0 +1,4 @@
+* get candle data (exchange, currency pair, ticker, time-start, time-end)
+* get candle data (exchange, currency pair, ticker, las_n_candles)
+* get_settings (json_struct)
+* set_settings (json_struct)
