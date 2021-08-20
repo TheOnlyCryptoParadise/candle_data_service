@@ -2,3 +2,8 @@
 * get candle data (exchange, currency pair, ticker, las_n_candles)
 * get_settings (json_struct)
 * set_settings (json_struct)
+* proper execption handling
+* propper  logging
+* docs
+* validators from pydantic 
+* requirements.txt

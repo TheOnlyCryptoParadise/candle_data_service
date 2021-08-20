@@ -1,9 +1,10 @@
-from app import app
+from app.candleDAO import CandleDAO
+from app import app, settingsManager
 import json
 from app import model
+from app import candleDAO
 from flask import request
-from app.DynamoDb import DynamoDb
-from app.candleDAO import DynamoDbCandleDAO
+
 
 def _get_settings_gen():
 
@@ -11,13 +12,13 @@ def _get_settings_gen():
         return model.Settings(**json.load(settings_file))
 
 
-def get_candles_from_database(req: model.GetCandlesRequest):
+def _get_candles_from_database(req: model.GetCandlesRequest):
 
-    db = DynamoDb() # TODO no need to create on every request
-    candleDAO = DynamoDbCandleDAO(db)
 
 
     return model.GetCandleResponse(data=candleDAO.get_candles(req))
+    
+    
     return model.GetCandleResponse(data=[
         model.Candle(
             
@@ -41,21 +42,20 @@ def index():
 @app.route("/settings", methods=["GET"])
 def get_settings():
 
-    settings = _get_settings_gen()
+    settings = settingsManager.get()
 
     return settings.dict()
 
 
 @app.route("/settings", methods=["PUT"])
 def put_settings():
-    raise NotImplementedError()
-    return "OK"
-
+    settingsManager.set_dict_settings(request.get_json())
+    return {"result": 200, "msg": "OK"}
 
 @app.route("/candles", methods=["GET"])
 def get_candles():
     options = model.GetCandlesRequest(**request.args)
 
-    data = get_candles_from_database(options)
+    data = _get_candles_from_database(options)
     return  data.dict()
 
