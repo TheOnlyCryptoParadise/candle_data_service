@@ -1,12 +1,13 @@
 from botocore import endpoint
 from app import model
-from app import app
 from typing import List
 from abc import ABC, abstractmethod
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 import json 
+from flask import g
+from flask import current_app
 
 class SettingsDAO(ABC):
 
@@ -22,8 +23,8 @@ class SettingsDAO(ABC):
 class S3SettingsDAO(SettingsDAO):
 
     def __init__(self, bucket_name, object_name):
-        if "S3_ENDPOINT_URL" in app.config:
-            self.s3_client = boto3.client('s3', endpoint_url=app.config["S3_ENDPOINT_URL"])
+        if "S3_ENDPOINT_URL" in current_app.config:
+            self.s3_client = boto3.client('s3', endpoint_url=current_app.config["S3_ENDPOINT_URL"])
         else:
             self.s3_client = boto3.client('s3')
         self.bucket_name = bucket_name
@@ -56,3 +57,12 @@ class SettingsManager:
 
 
 
+def get_settingsManager():
+    if "settingsManager" not in g:
+        settingsDAO = None
+        if current_app.config['SETTINGS_DATA_PROVIDER'] == "S3":
+            settingsDAO = S3SettingsDAO(current_app.config['S3_BUCKET_NAME'], current_app.config["S3_OBJECT_NAME"])
+        
+        g.settingsManager = SettingsManager(settingsDAO)
+
+    return g.settingsManager

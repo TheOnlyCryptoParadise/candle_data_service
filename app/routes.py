@@ -1,9 +1,11 @@
-from app.candleDAO import CandleDAO
-from app import app, settingsManager
 import json
 from app import model
-from app import candleDAO
 from flask import request
+from app.candleDAO import get_candleDAO
+from app.settings import get_settingsManager
+from flask import Blueprint
+
+main_routes = Blueprint('main_routes','main_routes')
 
 
 def _get_settings_gen():
@@ -15,7 +17,7 @@ def _get_settings_gen():
 def _get_candles_from_database(req: model.GetCandlesRequest):
 
 
-
+    candleDAO = get_candleDAO()
     return model.GetCandleResponse(data=candleDAO.get_candles(req))
     
     
@@ -33,26 +35,26 @@ def _get_candles_from_database(req: model.GetCandlesRequest):
     ])
 
 
-@app.route("/")
-@app.route("/index")
+@main_routes.route("/")
+@main_routes.route("/index")
 def index():
     return "Hello, World!"
 
 
-@app.route("/settings", methods=["GET"])
+@main_routes.route("/settings", methods=["GET"])
 def get_settings():
 
-    settings = settingsManager.get()
+    settings = get_settingsManager().get()
 
     return settings.dict()
 
 
-@app.route("/settings", methods=["PUT"])
+@main_routes.route("/settings", methods=["PUT"])
 def put_settings():
-    settingsManager.set_dict_settings(request.get_json())
+    get_settingsManager().set_dict_settings(request.get_json())
     return {"result": 200, "msg": "OK"}
-
-@app.route("/candles", methods=["GET"])
+ 
+@main_routes.route("/candles", methods=["GET"])
 def get_candles():
     options = model.GetCandlesRequest(**request.args)
 

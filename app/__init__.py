@@ -1,21 +1,22 @@
 from flask import Flask
+import os
 
-app = Flask(__name__)
-app.config.from_pyfile('config.py')
-
-from app.settings import SettingsManager, S3SettingsDAO
-settingsDAO = None
-if app.config['SETTINGS_DATA_PROVIDER'] == "S3":
-    settingsDAO = S3SettingsDAO(app.config['S3_BUCKET_NAME'], app.config["S3_OBJECT_NAME"])
-settingsManager = SettingsManager(settingsDAO)
-
-from app import routes
-from app.DynamoDb import DynamoDb
-from app.candleDAO import DynamoDbCandleDAO
-
-candleDAO = None
-if app.config['DATA_SOURCE_PROVIDER'] == "DynamoDB":
-    db = DynamoDb() # TODO no need to create on every request
-    candleDAO = DynamoDbCandleDAO(db)
+def create_app(test_config=None):
+    """Create and configure an instance of the Flask application."""
+    app = Flask(__name__, instance_relative_config=False)
+    app.config.from_pyfile('config.py')
+    if test_config is not None:
+        app.config.update(test_config)
 
 
+    # ensure the instance folder exists
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
+
+
+    # from app.settings import
+    from app.routes import main_routes
+    app.register_blueprint(main_routes)
+    return app
