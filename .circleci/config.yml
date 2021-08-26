@@ -26,6 +26,7 @@ jobs:
     environment:
       AWS_ACCESS_KEY_ID: test
       AWS_SECRET_ACCESS_KEY: test
+      FLASK_ENV: development
     docker:
       - image: cimg/python:3.8 # <-- the job steps run in this container
       - image: localstack/localstack:0.10.5 # <-- this is spun up for us by Circle
