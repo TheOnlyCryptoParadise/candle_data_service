@@ -1,5 +1,8 @@
 version: 2.1
-
+general:
+  branches:
+    only:
+      - master
 orbs:
   # The python orb contains a set of prepackaged CircleCI configuration you can use repeatedly in your configuration files
   # Orb commands and jobs help you with common scripting around a language/tool
@@ -56,3 +59,5 @@ jobs:
           name: Run tests
           # This assumes pytest is installed via the install-package step above
           command: pytest
+      - store_test_results:
+          path: test-results
