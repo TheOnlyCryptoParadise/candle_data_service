@@ -48,6 +48,9 @@ jobs:
       - run:
           name: install as package
           command: pip install -e .
+      - run: 
+          name: create_environment.py
+          command: python create_environment.py
       - run:
           name: Run tests
           # This assumes pytest is installed via the install-package step above
