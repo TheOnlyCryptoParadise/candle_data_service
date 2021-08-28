@@ -15,8 +15,10 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    # TODO Settings and temp file problem
+    from candle_data_service.settings import S3SettingsDAO, SettingsManager
 
     # from app.settings import
-    from app.routes import main_routes
+    from candle_data_service.routes import main_routes
     app.register_blueprint(main_routes)
     return app

@@ -1,10 +1,12 @@
 import json
-from app import model
+from candle_data_service import model
 from flask import request
-from app.candleDAO import get_candleDAO
-from app.settings import get_settingsManager
+from candle_data_service.candleDAO import get_candleDAO
+from candle_data_service.settings import get_settingsManager
 from flask import Blueprint
-
+import werkzeug.exceptions
+from pydantic import ValidationError
+import botocore.exceptions
 main_routes = Blueprint('main_routes','main_routes')
 
 
@@ -34,6 +36,14 @@ def _get_candles_from_database(req: model.GetCandlesRequest):
         )
     ])
 
+@main_routes.errorhandler(ValidationError)
+def bad_request_handler(e):
+    return 'bad request!', 400
+
+@main_routes.errorhandler(botocore.exceptions.ClientError)
+def botocore_exception_hanlder(e):
+    return "internal error", 500
+
 
 @main_routes.route("/")
 @main_routes.route("/index")
@@ -57,7 +67,12 @@ def put_settings():
 @main_routes.route("/candles", methods=["GET"])
 def get_candles():
     options = model.GetCandlesRequest(**request.args)
-
-    data = _get_candles_from_database(options)
-    return  data.dict()
+    try:
+        data = _get_candles_from_database(options)    
+        return  data.dict()
+    except botocore.exceptions.ClientError as e:
+        print(dir(e))
+        if e.response["Error"]["Code"] == "ResourceNotFoundException":
+            return model.GetCandleResponse(data=[]).dict()
+        raise e
 

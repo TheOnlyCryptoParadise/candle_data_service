@@ -33,6 +33,7 @@ jobs:
           AWS_ACCESS_KEY_ID: test
           AWS_SECRET_ACCESS_KEY: test
           FLASK_ENV: development
+          FLASK_APP: candle_data_service
       - image: localstack/localstack:latest # <-- this is spun up for us by Circle
         environment:
           DEBUG: 1
@@ -61,3 +62,4 @@ jobs:
           command: pytest
       - store_test_results:
           path: test-results
+

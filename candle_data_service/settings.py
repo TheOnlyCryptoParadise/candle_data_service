@@ -1,5 +1,5 @@
 from botocore import endpoint
-from app import model
+from candle_data_service import model
 from typing import List
 from abc import ABC, abstractmethod
 import boto3
@@ -31,6 +31,9 @@ class S3SettingsDAO(SettingsDAO):
         self.object_name = object_name
 
     def get_settings(self) -> List[model.Candle]:
+
+        #TODO
+        return model.Settings(exchanges=[]) 
         self.s3_client.download_file(self.bucket_name, self.object_name, 'tmp-settings.json')
         with open("tmp-settings.json") as settings_file:
             return model.Settings(**json.load(settings_file))        
@@ -63,6 +66,7 @@ def get_settingsManager():
         if current_app.config['SETTINGS_DATA_PROVIDER'] == "S3":
             settingsDAO = S3SettingsDAO(current_app.config['S3_BUCKET_NAME'], current_app.config["S3_OBJECT_NAME"])
         
+        assert settingsDAO != None, "no settingsDAO configured"
         g.settingsManager = SettingsManager(settingsDAO)
 
     return g.settingsManager

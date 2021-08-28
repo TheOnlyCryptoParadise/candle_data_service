@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 FLASK_ENV = environ.get('FLASK_ENV', 'development')
 
 basedir = path.abspath(path.dirname(__file__))
-load_dotenv(path.join(basedir, '../.main.env'))
+load_dotenv(path.join(basedir, '.main.env'))
 
 if FLASK_ENV == 'development':
-    load_dotenv(path.join(basedir, '../.dev.env'))
+    load_dotenv(path.join(basedir, '.dev.env'))
 
 
 TESTING=bool(environ.get('TESTING', "False"))

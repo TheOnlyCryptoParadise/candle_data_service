@@ -1,7 +1,7 @@
-from app import model
+from candle_data_service import model
 from typing import List
 from abc import ABC, abstractclassmethod, abstractmethod
-from app.DynamoDb import DynamoDb
+from candle_data_service.DynamoDb import DynamoDb
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 from flask import current_app, g
@@ -63,6 +63,6 @@ def get_candleDAO():
         if current_app.config["DATA_SOURCE_PROVIDER"] == "DynamoDB":
             db = DynamoDb()  # TODO no need to create on every request
             candleDAO = DynamoDbCandleDAO(db)
-
+        assert candleDAO != None, "no candleDAO configured"
         g.candleDAO = candleDAO
     return g.candleDAO
