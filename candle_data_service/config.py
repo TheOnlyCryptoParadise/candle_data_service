@@ -5,13 +5,13 @@ from dotenv import load_dotenv
 FLASK_ENV = environ.get('FLASK_ENV', 'development')
 
 basedir = path.abspath(path.dirname(__file__))
-load_dotenv(path.join(basedir, '../.env'))
+load_dotenv(path.join(basedir, '.main.env'))
 
 if FLASK_ENV == 'development':
-    load_dotenv(path.join(basedir, '../.dev.env'))
+    load_dotenv(path.join(basedir, '.dev.env'))
 
 
-TEST_DEBUG=environ.get('TEST_DEBUG')
+TESTING=bool(environ.get('TESTING', "False"))
 DATA_SOURCE_PROVIDER=environ.get('DATA_SOURCE_PROVIDER')
 SETTINGS_DATA_PROVIDER=environ.get('SETTINGS_DATA_PROVIDER')
 S3_BUCKET_NAME=environ.get('S3_BUCKET_NAME')
