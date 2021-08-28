@@ -12,14 +12,14 @@ def _get_settings_gen():
         return model.Settings(**json.load(settings_file))
 
 
-def _get_candles_from_database(req: model.GetCandlesRequest):
+def _get_candles_from_database(req: model.CandlesRequest):
 
 
 
-    return model.GetCandleResponse(data=candleDAO.get_candles(req))
+    return model.CandleResponse(data=candleDAO.get_candles(req))
     
     
-    return model.GetCandleResponse(data=[
+    return model.CandleResponse(data=[
         model.Candle(
             
                 open=123.1,
@@ -31,7 +31,6 @@ def _get_candles_from_database(req: model.GetCandlesRequest):
             
         )
     ])
-
 
 @app.route("/")
 @app.route("/index")
@@ -54,7 +53,7 @@ def put_settings():
 
 @app.route("/candles", methods=["GET"])
 def get_candles():
-    options = model.GetCandlesRequest(**request.args)
+    options = model.CandlesRequest(**request.args)
 
     data = _get_candles_from_database(options)
     return  data.dict()

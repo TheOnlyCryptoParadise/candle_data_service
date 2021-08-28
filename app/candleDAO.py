@@ -9,7 +9,7 @@ from boto3.dynamodb.conditions import Key, Attr
 class CandleDAO(ABC):
 
     @abstractmethod
-    def get_candles(self, request: model.GetCandlesRequest) -> List[model.Candle]:
+    def get_candles(self, request: model.CandlesRequest) -> List[model.Candle]:
         pass
 
 
@@ -21,7 +21,7 @@ class DynamoDbCandleDAO(CandleDAO):
         self.db = db.dynamodb
         pass
 
-    def get_candles(self, request: model.GetCandlesRequest) -> List[model.Candle]:
+    def get_candles(self, request: model.CandlesRequest) -> List[model.Candle]:
         table = self.db.Table(f"{request.currency_pair}") # TODO add exchange name to table in candle_getter also
         response = None
         if request.time_start and request.time_end:
