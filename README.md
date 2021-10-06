@@ -1,3 +1,4 @@
+![CryptoParadise](https://circleci.com/gh/TheOnlyCryptoParadise/candle_data_service.svg?style=svg)
 ## Run this project to add to the database single candle for each selected currency pair and ticker
 
 ## How to run:
