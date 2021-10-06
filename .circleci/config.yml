@@ -84,8 +84,9 @@ jobs:
           name: run build
           command: python -m build
       - persist_to_workspace:
+          root: dist/
           paths:
-            - dist/*
+            - ./*
 
 
 
@@ -99,7 +100,7 @@ jobs:
       - attach_workspace:
           at: dist/
       - run:
-        command: ls -al dist
+          command: ls -al dist
       - run:
           name: Install dependencies
           command: |
