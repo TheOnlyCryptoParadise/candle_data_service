@@ -83,6 +83,11 @@ jobs:
       - run:
           name: run build
           command: python -m build
+      - persist_to_workspace:
+          paths:
+            - dist/*
+
+
 
   build-docker:
     working_directory: /app
@@ -91,6 +96,10 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - attach_workspace:
+          at: dist/
+      - run:
+        command: ls -al dist
       - run:
           name: Install dependencies
           command: |
