@@ -143,5 +143,5 @@ jobs:
               docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
               docker tag app "lewelyn/cryptoparadise-candle_data_service:${CIRCLE_SHA1}"
               docker tag app "lewelyn/cryptoparadise-candle_data_service:latest"
-              docker push lewelyn/cryptoparadise-candle_data_service:latest --all-tags
+              docker push lewelyn/cryptoparadise-candle_data_service --all-tags
             fi
