@@ -16,7 +16,12 @@ workflows:
     # For more details on extending your workflow, see the configuration docs: https://circleci.com/docs/2.0/configuration-reference/#workflows 
     jobs:
       - test-pytest
+      - build-dist:
+          requires:
+            - test-pytest
       - build-docker:
+          requires:
+            - build-dist
           context:
             - secrets
 
@@ -65,6 +70,26 @@ jobs:
       - store_test_results:
           path: test-results
 
+  build-dist:
+    docker:
+      - image: cimg/python:3.8 # <-- the job steps run in this container
+        environment:
+          FLASK_APP: candle_data_service       
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+          args: build
+      - run:
+          name: run build
+          command: python -m build
+      - persist_to_workspace:
+          root: dist/
+          paths:
+            - ./*
+
+
+
   build-docker:
     working_directory: /app
     docker:
@@ -72,6 +97,10 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - attach_workspace:
+          at: dist/
+      - run:
+          command: ls -al dist
       - run:
           name: Install dependencies
           command: |
@@ -114,5 +143,5 @@ jobs:
               docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
               docker tag app "lewelyn/cryptoparadise-candle_data_service:${CIRCLE_SHA1}"
               docker tag app "lewelyn/cryptoparadise-candle_data_service:latest"
-              docker push lewelyn/cryptoparadise-candle_data_service:latest --all-tags
+              docker push lewelyn/cryptoparadise-candle_data_service --all-tags
             fi
