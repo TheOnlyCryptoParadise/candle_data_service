@@ -34,7 +34,7 @@ class DynamoDbCandleDAO(CandleDAO):
         elif request.last_n_candles:
             response = table.query(
                 KeyConditionExpression=Key("ticker").eq(request.ticker),
-                ScanIndexForward=False,
+                ScanIndexForward=True,
                 Limit=request.last_n_candles,
             )
         else:
@@ -48,7 +48,7 @@ class DynamoDbCandleDAO(CandleDAO):
                 low=c["low"],
                 close=c["close"],
                 volume=c["volume"],
-                timestamp=c["timestamp"],
+                time=c["timestamp"],
             )
             for c in response["Items"]
         ]
