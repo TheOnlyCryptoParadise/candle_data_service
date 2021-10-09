@@ -22,7 +22,7 @@ class Candle(BaseModel):
     low: float
     close: float
     volume: float
-    timestamp: int
+    time: int
 
 class CandleResponse(BaseModel):
     data: List[Candle]
