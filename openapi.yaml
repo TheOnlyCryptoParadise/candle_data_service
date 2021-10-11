@@ -56,9 +56,21 @@ paths:
                   $ref: '#/components/schemas/Candle' 
                   
   /currencyPair:
-    get:
-      summary: "Returns dict with stats about currency pair"
-
+    post:
+      summary: "Returns dict with stats about currency pairs"
+      requestBody:
+        description: List of currency pairs
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+              example: 
+                - "BTC/USDT"
+                - "ETH/USDT"
+  
       responses:
         '200':
           description: "dict with currency_pair as keys and output from exchange as values. There is 'last' key in this outputs and its value is current price of an asset on the exchange."          
