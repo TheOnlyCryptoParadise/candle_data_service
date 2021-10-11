@@ -44,9 +44,9 @@ def _get_candles_from_database(req: model.GetCandlesRequest):
 # def bad_request_handler(e):
 #     return 'bad request!', 400
 
-@main_routes.errorhandler(botocore.exceptions.ClientError)
-def botocore_exception_hanlder(e):
-    return "internal error", 500
+# @main_routes.errorhandler(botocore.exceptions.ClientError)
+# def botocore_exception_hanlder(e):
+#     return "internal error", 500
 
 
 @main_routes.route("/")
@@ -91,3 +91,30 @@ async def get_current_prices():
     await close_exchange_all()
     return result, 200
     
+
+@main_routes.route("/downloadCandles", methods=["POST"])
+async def download_candles_route():
+    request_data = model.DownloadCandlesRequest(**dict(request.get_json()))
+
+    candle_data = await download_candles(request_data)
+    candleDAO = get_candleDAO()
+    candleDAO.put_candles(candle_data)
+
+    # loop.close()
+    await close_exchange_all()
+
+    return { 'msg': 'success'}, 200
+
+
+async def download_candles(request_data : model.DownloadCandlesRequest):
+    async_reqs = []
+    # Configure and run configured behaviour.
+    for exchange in request_data.exchanges:
+        for pair in exchange.pairs:
+            for candle_size in exchange.candle_sizes:
+                async_reqs.append(asyncio.create_task(get_exchange(exchange.name).get_historical_data(pair, candle_size, max_periods=5)))
+
+
+    finished_tasks, pending = await asyncio.wait(async_reqs)
+    candle_data = [task.result() for task in finished_tasks]   
+    return candle_data

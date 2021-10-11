@@ -1,3 +1,4 @@
+from os import pardir
 import flask
 from pydantic import BaseModel
 from typing import List, Dict, Optional
@@ -15,6 +16,14 @@ class GetCandlesRequest(BaseModel):
     time_end: Optional[int]
     last_n_candles: Optional[int]
 
+class DownloadExchangeInfo(BaseModel):
+    name: str
+    pairs: List[str]
+    candle_sizes: List[str]
+
+class DownloadCandlesRequest(BaseModel):
+    exchanges: List[DownloadExchangeInfo]
+    last_n_candles: Optional[int]
 
 class Candle(BaseModel):
     open: float
