@@ -40,13 +40,13 @@ def _get_candles_from_database(req: model.GetCandlesRequest):
         )
     ])
 
-# @main_routes.errorhandler(ValidationError)
-# def bad_request_handler(e):
-#     return 'bad request!', 400
+@main_routes.errorhandler(ValidationError)
+def bad_request_handler(e):
+    return 'bad request!', 400
 
-# @main_routes.errorhandler(botocore.exceptions.ClientError)
-# def botocore_exception_hanlder(e):
-#     return "internal error", 500
+@main_routes.errorhandler(botocore.exceptions.ClientError)
+def botocore_exception_hanlder(e):
+    return "internal error", 500
 
 
 @main_routes.route("/")
@@ -83,7 +83,7 @@ def get_candles():
 #TODO make fault tolerant and exceptions
 @main_routes.route("/currencyPairLiveInfo", methods=["POST"]) # TODO add request schema validation
 async def get_current_prices():
-    currencies = dict(request.get_json())
+    currencies = dict(request.get_json()['exchanges'])
     exchange_name = list(currencies.keys())[0]
     exchange = get_exchange(exchange_name)
     result  = await exchange.get_latest(currencies[exchange_name]['pairs'])
