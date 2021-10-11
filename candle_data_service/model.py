@@ -10,7 +10,7 @@ class Exchange(BaseModel):
 class GetCandlesRequest(BaseModel):
     exchange: str
     currency_pair: str
-    ticker: str
+    candle_size: str
     time_start: Optional[int]
     time_end: Optional[int]
     last_n_candles: Optional[int]

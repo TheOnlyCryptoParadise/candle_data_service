@@ -4,7 +4,8 @@ services:
   localstack:
     container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
     image: localstack/localstack
-    network_mode: bridge
+    networks:
+        - jupyter
     ports:
       - "127.0.0.1:53:53"
       - "127.0.0.1:53:53/udp"
@@ -23,3 +24,6 @@ services:
     volumes:
       - ./tmp/localstack:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
+networks:
+  jupyter:
+    name: localstack_network

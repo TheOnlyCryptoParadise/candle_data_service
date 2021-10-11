@@ -73,3 +73,21 @@ def test_get_wrong_request_candles(client):
 
     assert "400" in rv.status
 
+
+def test_get_current_prices(client):
+    # TODO reset databases
+    request_body = {
+        "binance": {
+            "pairs": [
+                "BTC/USDT",
+                "ETH/USDT"
+            ]
+        }
+        }
+
+    rv = client.post("/currencyPairLiveInfo", json=request_body)
+
+    assert "200" in rv.status
+    assert type(rv.get_json()['BTC/USDT']['last']) is float
+    assert type(rv.get_json()['ETH/USDT']['last']) is float
+

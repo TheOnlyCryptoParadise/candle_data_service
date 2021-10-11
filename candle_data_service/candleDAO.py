@@ -28,12 +28,12 @@ class DynamoDbCandleDAO(CandleDAO):
         response = None
         if request.time_start and request.time_end:
             response = table.query(
-                KeyConditionExpression=Key("ticker").eq(request.ticker)
+                KeyConditionExpression=Key("candle_size").eq(request.candle_size)
                 & Key("timestamp").between(request.time_start, request.time_end)
             )
         elif request.last_n_candles:
             response = table.query(
-                KeyConditionExpression=Key("ticker").eq(request.ticker),
+                KeyConditionExpression=Key("candle_size").eq(request.candle_size),
                 ScanIndexForward=False,
                 Limit=request.last_n_candles,
             )
