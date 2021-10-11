@@ -16,6 +16,55 @@ servers:
 - url: candle-data-service/api
 
 paths:
+  /downloadCandles:
+    post:
+      summary: call to fill database with candles
+      requestBody:
+        description: object with info what to download
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                exchanges:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      pairs:
+                        type: array
+                        items:
+                          type: string
+                      candle_sizes:
+                        type: array
+                        items:
+                          type: string
+                last_n_candles:
+                  type: integer
+              example:
+                exchanges:
+                   -  name: "binance"
+                      pairs:
+                        - "BTC/USDT"
+                        - "ETH/USDT"
+                      candle_sizes:
+                        - "15m"
+                        - "1h"
+                last_n_candles: 5
+      responses:
+        '200':
+          description: "A list of candles"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: "success"
   /candles:
     get:
       summary: "Returns list of latest candles"
@@ -45,6 +94,12 @@ paths:
           schema:
             type: integer
           description: "Unix timestamp"          
+        - in: query
+          name: last_n_candles
+          schema:
+            type: integer
+          description: "how many last candles to get"
+          example: 5
       responses:
         '200':
           description: "A list of candles"
@@ -55,22 +110,36 @@ paths:
                 items:
                   $ref: '#/components/schemas/Candle' 
                   
-  /currencyPair:
+  /currencyPairLiveInfo:
     post:
       summary: "Returns dict with stats about currency pairs"
       requestBody:
-        description: List of currency pairs
+        description: object with list of currency pairs
         required: true
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: string
-              example: 
-                - "BTC/USDT"
-                - "ETH/USDT"
-  
+              type: object
+              properties:
+                exchanges:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    pairs:
+                      type: array
+                      items:
+                        type: string
+              example:
+                exchanges:
+                  name: binance
+                  pairs:
+                    - "BTC/USDT"
+                    - "ETH/USDT"
+
+                  
+
+      
       responses:
         '200':
           description: "dict with currency_pair as keys and output from exchange as values. There is 'last' key in this outputs and its value is current price of an asset on the exchange."          
