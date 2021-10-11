@@ -1,6 +1,7 @@
 """Flask configuration."""
 from os import environ, path
 from dotenv import load_dotenv
+import logging
 
 FLASK_ENV = environ.get('FLASK_ENV', 'development')
 
@@ -17,6 +18,9 @@ SETTINGS_DATA_PROVIDER=environ.get('SETTINGS_DATA_PROVIDER')
 S3_BUCKET_NAME=environ.get('S3_BUCKET_NAME')
 S3_OBJECT_NAME=environ.get('S3_OBJECT_NAME')
 S3_ENDPOINT_URL=environ.get('S3_ENDPOINT_URL')
+
+DYNAMODB_ENDPOINT_URL=environ.get('DYNAMODB_ENDPOINT_URL')
+DYNAMODB_REGION=environ.get('DYNAMODB_REGION')
 
 
 #TESTING = True
