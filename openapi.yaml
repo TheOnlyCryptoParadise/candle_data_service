@@ -1,0 +1,223 @@
+openapi: 3.0.1
+info:
+  title: Candle Data Service
+  description: ""
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: candle-data-service/api
+
+paths:
+  /downloadCandles:
+    post:
+      summary: call to fill database with candles
+      requestBody:
+        description: object with info what to download
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                exchanges:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      pairs:
+                        type: array
+                        items:
+                          type: string
+                      candle_sizes:
+                        type: array
+                        items:
+                          type: string
+                last_n_candles:
+                  type: integer
+              example:
+                exchanges:
+                   -  name: "binance"
+                      pairs:
+                        - "BTC/USDT"
+                        - "ETH/USDT"
+                      candle_sizes:
+                        - "15m"
+                        - "1h"
+                last_n_candles: 5
+      responses:
+        '200':
+          description: "A list of candles"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: "success"
+  /candles:
+    get:
+      summary: "Returns list of latest candles"
+      parameters:
+        - in: query
+          name: exchange
+          schema:
+            type: string
+          description: "name of exchange eg. Binance"
+        - in: query
+          name: currency_pair
+          schema:
+            type: string
+          example: "BTC_USDT"
+        - in: query
+          name: candle_size
+          schema:
+            type: string
+          example: "15m"
+        - in: query
+          name: time_start
+          schema:
+            type: integer
+          description: "Unix timestamp"
+        - in: query
+          name: time_end
+          schema:
+            type: integer
+          description: "Unix timestamp"          
+        - in: query
+          name: last_n_candles
+          schema:
+            type: integer
+          description: "how many last candles to get"
+          example: 5
+      responses:
+        '200':
+          description: "A list of candles"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Candle' 
+                  
+  /currencyPairLiveInfo:
+    post:
+      summary: "Returns dict with stats about currency pairs"
+      requestBody:
+        description: object with list of currency pairs
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                exchanges:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    pairs:
+                      type: array
+                      items:
+                        type: string
+              example:
+                exchanges:
+                  name: binance
+                  pairs:
+                    - "BTC/USDT"
+                    - "ETH/USDT"
+
+                  
+
+      
+      responses:
+        '200':
+          description: "dict with currency_pair as keys and output from exchange as values. There is 'last' key in this outputs and its value is current price of an asset on the exchange."          
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  "BTC/USDT":
+                    symbol: BTC/USDT
+                    timestamp: 1633784707563
+                    datetime: '2021-10-09T13:05:07.563Z'
+                    high: 55340.3
+                    low: 53661.67
+                    bid: 55052.32
+                    bidVolume: 1.1625
+                    ask: 55052.33
+                    askVolume: 0.03711
+                    vwap: 54558.31845417
+                    open: 54659.49
+                    close: 55050.75
+                    last: 55050.75
+                    previousClose: 54659.5
+                    change: 391.26
+                    percentage: 0.716
+                    average: null
+                    baseVolume: 40122.97867
+                    quoteVolume: 2189042247.6078324
+                    info:
+                      symbol: BTCUSDT
+                      priceChange: '391.26000000'
+                      priceChangePercent: '0.716'
+                      weightedAvgPrice: '54558.31845417'
+                      prevClosePrice: '54659.50000000'
+                      lastPrice: '55050.75000000'
+                      lastQty: '0.00296000'
+                      bidPrice: '55052.32000000'
+                      bidQty: '1.16250000'
+                      askPrice: '55052.33000000'
+                      askQty: '0.03711000'
+                      openPrice: '54659.49000000'
+                      highPrice: '55340.30000000'
+                      lowPrice: '53661.67000000'
+                      volume: '40122.97867000'
+                      quoteVolume: '2189042247.60783260'
+                      openTime: '1633698307563'
+                      closeTime: '1633784707563'
+                      firstId: '1086354118'
+                      lastId: '1087681340'
+                      count: '1327223'
+                  
+components:
+  schemas:
+    Candle:
+      type: object
+      properties:
+        open:
+          type: number
+          example: 124.34
+        high:
+          type: number
+          example: 1243.44
+        low:
+          type: number
+          example: 143.22
+        close:
+          type: number
+          example: 143.44     
+        volume:
+          type: number
+          example: 14312312.44
+        timestamp:
+          type: integer
+          example: 12345213
+      # Both properties are required
+      required:  
+        - open
+        - high
+        - low
+        - close
+        - timestamp
