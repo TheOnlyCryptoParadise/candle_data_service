@@ -1,4 +1,5 @@
 import json
+import re
 from candle_data_service import model
 from flask import request
 from candle_data_service import exchange
@@ -83,16 +84,17 @@ def get_candles():
 #TODO make fault tolerant and exceptions
 @main_routes.route("/currencyPairLiveInfo", methods=["POST"]) # TODO add request schema validation
 async def get_current_prices():
-    request_data = model.LivePriceRequest(**dict(request.get_json()))
-    # currencies = dict(request.get_json()['exchanges'])
-    currencies = request_data.exchanges
-    # exchange_name = list(currencies.keys())[0]
-    exchange_name = currencies[0].name
-    exchange = get_exchange(exchange_name)
-    result  = await exchange.get_latest(currencies[0].pairs)
+    print(dict(request.get_json()))
+    request_data = model.CurrencyLiveInfoRequest(**dict(request.get_json()))
+
+    result = []
+    for exchange_req in request_data.exchanges:
+        exchange_name = exchange_req.name
+        exchange = get_exchange(exchange_name)
+        result.append({"name": exchange_req.name, "data": await exchange.get_latest(exchange_req.pairs)})
     
     await close_exchange_all()
-    return result, 200
+    return {"data": result}, 200
     
 
 @main_routes.route("/downloadCandles", methods=["POST"])
@@ -115,7 +117,7 @@ async def download_candles(request_data : model.DownloadCandlesRequest):
     for exchange in request_data.exchanges:
         for pair in exchange.pairs:
             for candle_size in exchange.candle_sizes:
-                async_reqs.append(asyncio.create_task(get_exchange(exchange.name).get_historical_data(pair, candle_size, max_periods=200)))
+                async_reqs.append(asyncio.create_task(get_exchange(exchange.name).get_historical_data(pair, candle_size, max_periods=request_data.last_n_candles)))
 
 
     finished_tasks, pending = await asyncio.wait(async_reqs)
