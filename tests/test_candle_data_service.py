@@ -78,20 +78,21 @@ def test_get_wrong_request_candles(client):
 def test_get_current_prices(client):
     # TODO reset databases
     request_body = {
-        "exchanges":{
-            "binance": {
+        "exchanges":[
+            {
+                "name": "binance",
                 "pairs": [
                     "BTC/USDT",
                     "ETH/USDT"
                 ],
                 "candle_sizes": ["15m"]
-            }},
+            }],
         "last_n_candles" : 10
         }
 
     rv = client.post("/currencyPairLiveInfo", json=request_body)
 
     assert "200" in rv.status
-    assert type(rv.get_json()['BTC/USDT']['last']) is float
-    assert type(rv.get_json()['ETH/USDT']['last']) is float
+    assert type(rv.get_json()['data'][0]['data']["BTC/USDT"]['last']) is float
+    assert type(rv.get_json()['data'][0]['data']['ETH/USDT']['last']) is float
 

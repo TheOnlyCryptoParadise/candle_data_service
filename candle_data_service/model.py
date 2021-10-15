@@ -25,6 +25,13 @@ class DownloadCandlesRequest(BaseModel):
     exchanges: List[DownloadExchangeInfo]
     last_n_candles: Optional[int]
 
+class CurrencyLiveInfoExchange(BaseModel):
+    name: str
+    pairs: List[str]
+
+class CurrencyLiveInfoRequest(BaseModel):
+    exchanges: List[CurrencyLiveInfoExchange]
+
 class Candle(BaseModel):
     open: float
     high: float

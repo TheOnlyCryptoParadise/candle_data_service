@@ -3,7 +3,7 @@ services:
   candle_data_service:
     image: "lewelyn/cryptoparadise-candle_data_service:latest"
     networks:
-      - localstack_network
+      - localstack-net
     ports:
       - "5000:8080"
     environment:
@@ -14,6 +14,6 @@ services:
       DYNAMODB_ENDPOINT_URL: "http://localstack:4566"
 
 networks:
-  localstack_network:
+  localstack-net:
     external: true
-    name: localstack_network
+    name: localstack-net
