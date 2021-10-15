@@ -13,7 +13,7 @@ import time
 
 class CandleDAO(ABC):
     @abstractmethod
-    def get_candles(self, request: model.GetCandlesRequest) -> List[model.Candle]:
+    def get_candles(self, request: model.CandlesRequest) -> List[model.Candle]:
         pass
 
 
@@ -31,7 +31,7 @@ class DynamoDbCandleDAO(CandleDAO):
         # self.logger.addHandler(strh)
         pass
 
-    def get_candles(self, request: model.GetCandlesRequest) -> List[model.Candle]:
+    def get_candles(self, request: model.CandlesRequest) -> List[model.Candle]:
         #TODO add exchange in name of table
         # table_name = request.exchange + "_" + request.currency_pair.replace("/","_") + "_" + request.candle_size
         table_name = request.currency_pair.replace("/","_") + "_" + request.candle_size

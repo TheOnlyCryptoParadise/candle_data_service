@@ -8,7 +8,7 @@ class Exchange(BaseModel):
     name: str
     ticker_settings: Dict[str, List[str]]
 
-class GetCandlesRequest(BaseModel):
+class CandlesRequest(BaseModel):
     exchange: str
     currency_pair: str
     candle_size: str
@@ -33,8 +33,15 @@ class Candle(BaseModel):
     volume: float
     time: int
 
-class GetCandleResponse(BaseModel):
+class CandleResponse(BaseModel):
     data: List[Candle]
 
 class Settings(BaseModel):
     exchanges: List[Exchange]
+
+class LivePriceExchangesRequest(BaseModel):
+    name: str
+    pairs: List[str]
+
+class LivePriceRequest(BaseModel):
+    exchanges: List[LivePriceExchangesRequest]
