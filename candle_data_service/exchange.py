@@ -16,8 +16,6 @@ import asyncio
 class ExchangeInterface():
 
     def __init__(self, exchange_name):
-
-
         self.logger = logging.getLogger().getChild(self.__class__.__name__)
 
         self.ccxt_exchange = getattr(ccxt, exchange_name)({
@@ -30,7 +28,7 @@ class ExchangeInterface():
         else:
             self.logger.error("Unable to load exchange %s", exchange_name)
 
-    async def get_historical_data(self, market_pair, time_unit, start_date=None, max_periods=3):
+    async def get_historical_data(self, market_pair, time_unit, start_date=None, max_periods=200):
         """Get historical OHLCV for a symbol pair
 
         Decorators:

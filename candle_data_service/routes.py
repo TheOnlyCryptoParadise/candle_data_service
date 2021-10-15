@@ -21,14 +21,14 @@ def _get_settings_gen():
         return model.Settings(**json.load(settings_file))
 
 
-def _get_candles_from_database(req: model.GetCandlesRequest):
+def _get_candles_from_database(req: model.CandlesRequest):
 
 
     candleDAO = get_candleDAO()
-    return model.GetCandleResponse(data=candleDAO.get_candles(req))
+    return model.CandleResponse(data=candleDAO.get_candles(req))
     
     
-    return model.GetCandleResponse(data=[
+    return model.CandleResponse(data=[
         model.Candle(
             
                 open=123.1,
@@ -71,14 +71,14 @@ def put_settings():
  
 @main_routes.route("/candles", methods=["GET"])
 def get_candles():
-    options = model.GetCandlesRequest(**request.args)
+    options = model.CandlesRequest(**request.args)
     try:
         data = _get_candles_from_database(options)    
         return  data.dict()
     except botocore.exceptions.ClientError as e:
         print(dir(e))
         if e.response["Error"]["Code"] == "ResourceNotFoundException":
-            return model.GetCandleResponse(data=[]).dict()
+            return model.CandleResponse(data=[]).dict()
         raise e
 
 #TODO make fault tolerant and exceptions
