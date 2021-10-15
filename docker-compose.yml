@@ -16,4 +16,4 @@ services:
 networks:
   localstack_network:
     external: true
-    name: localstack_network
+    name: localstack-net

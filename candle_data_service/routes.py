@@ -112,7 +112,7 @@ async def download_candles(request_data : model.DownloadCandlesRequest):
     for exchange in request_data.exchanges:
         for pair in exchange.pairs:
             for candle_size in exchange.candle_sizes:
-                async_reqs.append(asyncio.create_task(get_exchange(exchange.name).get_historical_data(pair, candle_size, max_periods=5)))
+                async_reqs.append(asyncio.create_task(get_exchange(exchange.name).get_historical_data(pair, candle_size, max_periods=200)))
 
 
     finished_tasks, pending = await asyncio.wait(async_reqs)
