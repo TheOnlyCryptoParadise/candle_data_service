@@ -18,7 +18,7 @@ RUN pip install /app/*.whl
 COPY candle_data_service/create_environment.py /app/
 COPY candle_data_service/.dev.env /app/
 COPY candle_data_service/.main.env /app/
-COPY candle_data_service/database_create.sql /app/
+COPY database_create.sql /app/
 
 ENTRYPOINT ["waitress-serve", "--call", "candle_data_service:create_app"]
 
