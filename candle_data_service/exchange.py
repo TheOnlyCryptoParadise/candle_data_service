@@ -45,13 +45,20 @@ class ExchangeInterface():
         Returns:
             list: Contains a list of lists which contain timestamp, open, high, low, close, volume.
         """
-
-
-        historical_data = await self.ccxt_exchange.fetch_ohlcv(
+        historical_data = None
+        if start_date:
+            historical_data = await self.ccxt_exchange.fetch_ohlcv(
+            market_pair,
+            timeframe=time_unit,
+            since=int(start_date*1000),
+            limit=int(max_periods)
+            )
+        else:
+            historical_data = await self.ccxt_exchange.fetch_ohlcv(
             market_pair,
             timeframe=time_unit,
             limit=max_periods
-        )
+            )
 
         if not historical_data:
             raise ValueError(

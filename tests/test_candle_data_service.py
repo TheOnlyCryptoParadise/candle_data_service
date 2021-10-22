@@ -60,8 +60,8 @@ def test_get_no_table_candles(client):
         }
     rv = client.get("/candles", query_string=args)
 
-    assert "200" in rv.status
-    assert len(rv.get_json()['data']) == 0
+    assert "400" in rv.status
+    # assert len(rv.get_json()['data']) == 0
 
 def test_get_wrong_request_candles(client):
     # TODO reset databases
@@ -96,3 +96,118 @@ def test_get_current_prices(client):
     assert type(rv.get_json()['data'][0]['data']["BTC/USDT"]['last']) is float
     assert type(rv.get_json()['data'][0]['data']['ETH/USDT']['last']) is float
 
+def test_download_candles(client):
+    request_body = {
+        "exchanges": [{
+            "name": "binance",
+            "pairs": [ "BTC/USDT", "ETH/USDT"],
+            "candle_sizes": ["1m", "5m", "1h"]
+        }],
+        "last_n_candles": 5
+    }
+    rv = client.post("/downloadCandles", json=request_body)
+    assert "200" in rv.status
+
+def test_duplicate_keys(client):
+    request_body = {
+        "exchanges": [{
+            "name": "binance",
+            "pairs": [ "DOT/USDT"],
+            "candle_sizes": ["4h"]
+        }],
+        "last_n_candles": 5
+    }
+    rv1 = client.post("/downloadCandles", json=request_body)
+
+    request_body = {
+        "exchanges": [{
+            "name": "binance",
+            "pairs": [ "DOT/USDT"],
+            "candle_sizes": ["4h"]
+        }],
+        "last_n_candles": 6
+    }
+    rv2 = client.post("/downloadCandles", json=request_body)
+    args = {
+        "exchange": "binance",
+        "currency_pair": "DOT/USDT",
+        "candle_size": "4h",
+        "last_n_candles": 10
+    }
+    rv3 = client.get("/candles", query_string=args)
+    assert "200" in rv1.status
+    assert "200" in rv2.status
+    assert "200" in rv3.status
+    assert len(rv3.get_json()['data']) == 6
+
+def test_download_and_get_candles(client):
+    request_body = {
+        "exchanges": [{
+            "name": "binance",
+            "pairs": [ "LINK/USDT"],
+            "candle_sizes": ["1m"]
+        }],
+        "last_n_candles": 10
+    }
+    rv1 = client.post("/downloadCandles", json=request_body)
+
+    args = {
+        "exchange": "binance",
+        "currency_pair": "LINK/USDT",
+        "candle_size": "1m",
+        "last_n_candles": 5
+    }
+    rv2 = client.get("/candles", query_string=args)
+    assert "200" in rv1.status
+    assert "200" in rv2.status
+    assert len(rv2.get_json()['data']) == 5
+    assert type(rv2.get_json()['data'][0]['open']) is float
+    assert type(rv2.get_json()['data'][0]['high']) is float
+    assert type(rv2.get_json()['data'][0]['low']) is float
+    assert type(rv2.get_json()['data'][0]['close']) is float
+    assert type(rv2.get_json()['data'][0]['volume']) is float
+
+def test_get_available_data(client):
+    request_body = {
+        "exchanges": [{
+            "name": "binance",
+            "pairs": [ "XRP/USDT"],
+            "candle_sizes": ["1h"]
+        }],
+        "last_n_candles": 10
+    }
+    rv1 = client.post("/downloadCandles", json=request_body)
+
+    rv2 = client.get("/availableCandles")
+
+    assert "200" in rv1.status
+    assert "200" in rv2.status
+    assert rv2.get_json()['data']['binance']['XRP/USDT']["1h"][0]['no_candles'] == 10
+    assert type(rv2.get_json()['data']['binance']['XRP/USDT']["1h"][0]['time_start']) is int
+    assert type(rv2.get_json()['data']['binance']['XRP/USDT']["1h"][0]['time_end']) is int
+
+def test_get_candles_time_start_end(client):
+    request_body = {
+        "exchanges": [{
+            "name": "binance",
+            "pairs": [ "ATOM/USDT"],
+            "candle_sizes": ["1h"]
+        }],
+        "time_start": 1634822085,
+        "time_end": 1634908485
+    }
+    rv1 = client.post("/downloadCandles", json=request_body)
+    rv2 = client.get("/availableCandles")
+
+    request_body['time_end'] = 1634912085
+    rv3 = client.post("/downloadCandles", json=request_body)
+
+    rv4 = client.get("/availableCandles")
+    assert "200" in rv1.status
+    assert "200" in rv2.status
+    assert "200" in rv3.status
+    assert "200" in rv4.status
+    assert rv2.get_json()['data']['binance']['ATOM/USDT']["1h"][0]['no_candles'] == 24
+    assert rv4.get_json()['data']['binance']['ATOM/USDT']["1h"][0]['no_candles'] == 25
+    assert type(rv2.get_json()['data']['binance']['XRP/USDT']["1h"][0]['time_start']) is int
+    assert type(rv2.get_json()['data']['binance']['XRP/USDT']["1h"][0]['time_end']) is int

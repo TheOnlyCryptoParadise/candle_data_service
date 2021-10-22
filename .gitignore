@@ -272,3 +272,5 @@ fabric.properties
 /tmp
 tmp-settings.json
 aws_cred.sh
+.vscode/settings.json
+localstack_mariadb.session.sql
