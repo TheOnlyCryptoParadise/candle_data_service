@@ -11,7 +11,11 @@ services:
       AWS_SECRET_ACCESS_KEY: test
       FLASK_ENV: development
       FLASK_APP: candle_data_service
+      DATA_SOURCE_PROVIDER: MariaDB
       DYNAMODB_ENDPOINT_URL: "http://localstack:4566"
+      MARIADB_HOST: sql-db
+    entrypoint: ['sh', '-c']
+    command: "'python create_environment.py && waitress-serve --call candle_data_service:create_app'"
 
 networks:
   localstack-net:

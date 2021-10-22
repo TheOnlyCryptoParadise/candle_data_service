@@ -41,10 +41,12 @@ jobs:
           AWS_SECRET_ACCESS_KEY: test
           FLASK_ENV: development
           FLASK_APP: candle_data_service
-      - image: localstack/localstack:latest # <-- this is spun up for us by Circle
+      - image: mariadb:latest # <-- this is spun up for us by Circle
         environment:
-          DEBUG: 1
-          SERVICES: s3,dynamodb
+          MYSQL_ROOT_PASSWORD: test   
+          MYSQL_USER: test   
+          MYSQL_PASSWORD: test
+          MYSQL_DATABASE: candle_data_service
         
     # Checkout the code as the first step. This is a dedicated CircleCI step.
     # The python orb's install-packages step will install the dependencies from a Pipfile via Pipenv by default.
@@ -62,7 +64,7 @@ jobs:
           command: pip install -e .
       - run: 
           name: create_environment.py
-          command: python create_environment.py
+          command: python candle_data_service/create_environment.py
       - run:
           name: Run tests
           # This assumes pytest is installed via the install-package step above

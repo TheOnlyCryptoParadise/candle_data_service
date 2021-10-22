@@ -1,7 +1,37 @@
 """Flask configuration."""
 from os import environ, path
 from dotenv import load_dotenv
+from logging.config import dictConfig
 import logging
+
+dictConfig(
+    {
+        "version": 1,
+        "formatters": {
+            "default": {
+                "format": "[%(asctime)s]:%(name)s:%(module)s:%(levelname)s: %(message)s",
+            }
+        },
+        "handlers": {
+            "wsgi": {
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout",
+                "formatter": "default",
+            }
+        },
+        'root': {
+            'level': 'INFO',
+            'handlers': ['wsgi']
+        },        
+        "loggers": {
+
+            "werkzeug": {"level": "INFO"},
+            "route_logger": {"level": "INFO"},
+            "candle_data_service.candleDAO" : {"level": "INFO", }
+        },
+    }
+)
+
 
 FLASK_ENV = environ.get('FLASK_ENV', 'development')
 
@@ -9,6 +39,7 @@ basedir = path.abspath(path.dirname(__file__))
 load_dotenv(path.join(basedir, '.main.env'))
 
 if FLASK_ENV == 'development':
+    logging.getLogger().info("MODE DEVELOPMENT")
     load_dotenv(path.join(basedir, '.dev.env'))
 
 
@@ -21,6 +52,12 @@ S3_ENDPOINT_URL=environ.get('S3_ENDPOINT_URL')
 
 DYNAMODB_ENDPOINT_URL=environ.get('DYNAMODB_ENDPOINT_URL')
 DYNAMODB_REGION=environ.get('DYNAMODB_REGION')
+
+MARIADB_HOST=environ.get('MARIADB_HOST')
+MARIADB_PORT=environ.get('MARIADB_PORT')
+MARIADB_USER=environ.get('MARIADB_USER')
+MARIADB_PASSWORD=environ.get('MARIADB_PASSWORD')
+MARIADB_DB_NAME=environ.get('MARIADB_DB_NAME')
 
 
 #TESTING = True

@@ -15,6 +15,7 @@ class CandlesRequest(BaseModel):
     time_start: Optional[int]
     time_end: Optional[int]
     last_n_candles: Optional[int]
+    download_on_demand : bool = True
 
 class DownloadExchangeInfo(BaseModel):
     name: str
@@ -24,7 +25,9 @@ class DownloadExchangeInfo(BaseModel):
 class DownloadCandlesRequest(BaseModel):
     exchanges: List[DownloadExchangeInfo]
     last_n_candles: Optional[int]
-
+    time_start: Optional[int]
+    time_end: Optional[int]
+    
 class CurrencyLiveInfoExchange(BaseModel):
     name: str
     pairs: List[str]

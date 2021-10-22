@@ -16,6 +16,58 @@ servers:
 - url: http://localhost:5000
 
 paths:
+  /availableCandles:
+    get:
+      summary: Returns info about available data in database
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      EXCHANGE_NAME:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            CURRENCY_PAIR:
+                              type: object
+                              properties:
+                                "CANDLE_SIZE":
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      time_start: 
+                                        type: integer
+                                      time_end: 
+                                        type: integer
+                                      no_candles:
+                                        type: integer
+              example:
+                data:
+                  "binance":
+                    - "BTC/USDT":
+                        "15m":
+                          - time_start: 1634628060
+                            time_end: 1634628060
+                            no_candles: 10
+                    - "ETH/USDT":
+                        "5m":
+                          - time_start: 1634628060
+                            time_end: 1634628060
+                            no_candles: 20
+                        "1h":
+                          - time_start: 1634628060
+                            time_end: 1634628060
+                            no_candles: 30
+                                                        
+
   /downloadCandles:
     post:
       summary: call to fill database with candles
@@ -101,6 +153,13 @@ paths:
             type: integer
           description: "how many last candles to get"
           example: 5
+        - in: query
+          name: download_on_demand
+          required: false
+          schema:
+            type: boolean
+          description: "whether to download new candles whe needed. True by default"
+          example: false
       responses:
         '200':
           description: "A list of candles"
@@ -113,6 +172,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Candle' 
+              
                   
   /currencyPairLiveInfo:
     post:
