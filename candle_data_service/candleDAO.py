@@ -171,7 +171,6 @@ class MariaDBCandleDAO(CandleDAO):
         # TODO add exchange in name of table
         # table_name = request.exchange + "_" + request.currency_pair.replace("/","_") + "_" + request.candle_size
         cursor = self.conn.cursor()
-
         query_last_n_candles = """SELECT c.timestamp,
                     cp.ticker,
                     c.candle_size,
@@ -181,7 +180,7 @@ class MariaDBCandleDAO(CandleDAO):
                     c.close,
                     c.volume
                 FROM candles c
-                    INNER join currency_pairs cp
+                    INNER join currency_pairs cp on cp.id = c.currency_pair
                 WHERE cp.ticker = ?
                     and c.candle_size = ? order by timestamp asc limit ?;
                 """
@@ -194,7 +193,7 @@ class MariaDBCandleDAO(CandleDAO):
                     c.close,
                     c.volume
                 FROM candles c
-                    INNER join currency_pairs cp
+                    INNER join currency_pairs cp on cp.id = c.currency_pair
                 WHERE FROM_UNIXTIME(?) <= c.timestamp
                     and c.timestamp <= FROM_UNIXTIME(?)
                     and cp.ticker = ?
@@ -205,7 +204,9 @@ class MariaDBCandleDAO(CandleDAO):
         response = None
         if request.time_start and request.time_end:
             cursor.execute(query_timestamps, (request.time_start, request.time_end, request.currency_pair, request.candle_size))
+            self.logger.info(f"requested: {request.currency_pair} {request.candle_size} from{request.time_start} to{request.time_end}")
         elif request.last_n_candles:
+            self.logger.info(f"requested: {request.currency_pair} {request.candle_size} {request.last_n_candles} candles")
             cursor.execute(query_last_n_candles, (request.currency_pair, request.candle_size, request.last_n_candles))
         else:
             raise ValueError("wrong request")
@@ -222,13 +223,13 @@ class MariaDBCandleDAO(CandleDAO):
             for r in response
         ]
         cursor.close()
+        self.logger.info(f"returning {len(response)} candles")
         return response        
 
     def put_candles(self, candle_data):
-        self.logger.info("sending candle_data all length %d to mariadb", len(candle_data))
-
         cursor = self.conn.cursor()
         for candle_record in candle_data:
+            self.logger.info(f"sending candle_data to mariadb {candle_record[0]} {candle_record[1]} {len(candle_record[2])} candles")
             # tables = cursor.execute("SHOW TABLES")
             cursor.execute(
                 "SELECT id FROM currency_pairs WHERE ticker=?", (candle_record[0],)

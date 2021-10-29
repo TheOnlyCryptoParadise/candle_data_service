@@ -26,8 +26,8 @@ dictConfig(
         "loggers": {
 
             "werkzeug": {"level": "INFO"},
-            "route_logger": {"level": "INFO"},
-            "candle_data_service.candleDAO" : {"level": "INFO", }
+            "route_logger": {"level": "DEBUG"},
+            "candle_data_service.candleDAO" : {"level": "INFO" }
         },
     }
 )
