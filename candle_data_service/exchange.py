@@ -90,11 +90,16 @@ def get_exchange(exchange_name) -> ExchangeInterface:
     return g.exchanges[exchange_name]
     
 
-async def close_exchange_all(e=None):
+async def close_exchange_all(self, e=None):
     exchanges = g.pop("exchanges", None)
 
     if exchanges is not None:
         for v in exchanges.values():
             await v.close() # TODO not one bye one but parallel
+    else:
+        self.logger.warning("exchange was None when closing")
+
+    # self.logger.warning("exchange was None when closing from self.")
+    self.ccxt_exchange.close()
 
 

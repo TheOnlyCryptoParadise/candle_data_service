@@ -26,9 +26,10 @@ import argparse
 
 # client = boto3.client('rds')
 # client.create_db_instance(DBName="candle_data_service", DBInstanceIdentifier='candle_data_service', )
+basedir = path.abspath(path.dirname(__file__))
 
 def create_tables(conn):
-    with open("database_create.sql", encoding='utf-8') as file:
+    with open(path.join(basedir, "database_create.sql"), encoding='utf-8') as file:
 
 
         cursor = conn.cursor()
