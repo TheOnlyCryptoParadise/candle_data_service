@@ -78,6 +78,10 @@ class ExchangeInterface():
     async def close(self):
         return await self.ccxt_exchange.close()
 
+    async def get_markets(self):
+        markets = await self.ccxt_exchange.load_markets()
+        return list(markets.keys())
+
 def get_exchange(exchange_name) -> ExchangeInterface:
     if "exchanges" not in g:
         g.exchanges = {}
@@ -96,5 +100,7 @@ async def close_exchange_all(e=None):
     if exchanges is not None:
         for v in exchanges.values():
             await v.close() # TODO not one bye one but parallel
+    else:
+        logging.warning("exchange was None while closing")
 
 

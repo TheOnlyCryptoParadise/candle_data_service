@@ -243,7 +243,12 @@ async def download_candles_route():
 
     return {"msg": "success"}, 200
 
-
+@main_routes.route("/availableMarkets", methods=["GET"])
+async def available_markets():
+    ex = get_exchange(request.args['exchange'])
+    markets = await ex.get_markets()
+    await close_exchange_all()
+    return {'data': markets}, 200
 async def download_candles_data(request_data: model.DownloadCandlesRequest):
     async_reqs = []
     try:
