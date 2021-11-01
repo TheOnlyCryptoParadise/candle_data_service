@@ -110,12 +110,25 @@ async def get_candles():
                 ]
                 current_time_start = available[0]['time_start']
                 current_time_end = available[0]['time_end']+_candle_size_to_seconds(options.candle_size)
+                current_no_candles = available[0]['no_candles']
                 candle_in_sec = _candle_size_to_seconds(options.candle_size)
-                
+                route_logger.debug(available[0])
                 if options.last_n_candles != None:
                     now = datetime.utcnow().timestamp()
                     delta = now - current_time_end # TODO not only 0
-                    if delta > candle_in_sec:
+                    if current_no_candles < options.last_n_candles:
+                        request_data = model.DownloadCandlesRequest(
+                            exchanges=[
+                                model.DownloadExchangeInfo(
+                                    name=options.exchange,
+                                    pairs=[options.currency_pair],
+                                    candle_sizes=[options.candle_size],
+                                )
+                            ],
+                            last_n_candles=options.last_n_candles,
+                        )
+                        await download_candles_data(request_data)                        
+                    elif delta > candle_in_sec:
                         possible_candles = math.floor(delta / candle_in_sec)
                         route_logger.info(f"new candles possible: {possible_candles}")
                         request_data = model.DownloadCandlesRequest(
@@ -163,6 +176,7 @@ async def get_candles():
                         await download_candles_data(request_data)
 
             except KeyError:
+                route_logger.info("KeyError downloading all")
                 request_data = None
                 if options.last_n_candles:
                     request_data = model.DownloadCandlesRequest(
@@ -252,12 +266,13 @@ async def available_markets():
 async def download_candles_data(request_data: model.DownloadCandlesRequest):
     async_reqs = []
     try:
+
         # Configure and run configured behaviour.
         for exchange in request_data.exchanges:
             for pair in exchange.pairs:
                 for candle_size in exchange.candle_sizes:
                     if request_data.last_n_candles:
-                        route_logger.debug(f"download latest{request_data.last_n_candles} candles ")
+                        route_logger.info(f"download latest {request_data.last_n_candles} candles ")
                         async_reqs.append(
                             asyncio.create_task(
                                 get_exchange(exchange.name).get_historical_data(
@@ -268,7 +283,7 @@ async def download_candles_data(request_data: model.DownloadCandlesRequest):
                     else:
                         time_delta = request_data.time_end - request_data.time_start
                         missing_candles = math.floor(time_delta / _candle_size_to_seconds(candle_size))
-                        route_logger.debug(f"download {missing_candles} candles from {request_data.time_start}")
+                        route_logger.info(f"download {missing_candles} candles from {request_data.time_start}")
                         async_reqs.append(
                             asyncio.create_task(
                                 get_exchange(exchange.name).get_historical_data(

@@ -28,7 +28,7 @@ class ExchangeInterface():
         else:
             self.logger.error("Unable to load exchange %s", exchange_name)
 
-    async def get_historical_data(self, market_pair, time_unit, start_date=None, max_periods=200):
+    async def get_historical_data(self, market_pair, time_unit, start_date=None, max_periods=1000):
         """Get historical OHLCV for a symbol pair
 
         Decorators:
@@ -57,7 +57,7 @@ class ExchangeInterface():
             historical_data = await self.ccxt_exchange.fetch_ohlcv(
             market_pair,
             timeframe=time_unit,
-            limit=max_periods
+            limit=int(max_periods)
             )
 
         if not historical_data:
