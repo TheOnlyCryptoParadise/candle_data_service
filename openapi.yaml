@@ -202,10 +202,7 @@ paths:
                     pairs:
                       - "BTC/USDT"
                       - "ETH/USDT"
-
-                  
-
-      
+     
       responses:
         '200':
           description: "dict with currency_pair as keys and output from exchange as values. There is 'last' key in this outputs and its value is current price of an asset on the exchange."          
@@ -259,7 +256,39 @@ paths:
                             firstId: '1086354118'
                             lastId: '1087681340'
                             count: '1327223'
-                      
+
+  /availableMarkets:
+    get:
+      summary: "Returns list of available markets"
+      parameters:
+        - in: query
+          name: exchange
+          schema:
+            type: string
+          example: binance
+      responses:
+        '200':
+          description: list of available markets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                        type: string
+              example:
+                data:
+                  - "ETH/BTC"
+                  - "LTC/BTC"
+                  - "BNB/BTC"
+                  - "NEO/BTC"
+                  - "QTUM/ETH"
+                  - "EOS/ETH"
+                  - "SNT/ETH"
+                  - "BNT/ETH"
+                  - "BCC/BTC"     
 components:
   schemas:
     Candle:

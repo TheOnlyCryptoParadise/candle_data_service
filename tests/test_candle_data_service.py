@@ -214,6 +214,15 @@ def test_get_candles_time_start_end(client):
     assert type(rv2.get_json()['data']['binance']['XRP/USDT']["1h"][0]['time_start']) is int
     assert type(rv2.get_json()['data']['binance']['XRP/USDT']["1h"][0]['time_end']) is int
 
+def test_available_markets(client):
+    args = {
+        "exchange": "binance",
+    }
+    rv = client.get("/availableMarkets", query_string=args)
+    assert "200" in rv.status
+    assert type(rv.get_json()['data'][0]) is str
+    assert type(rv.get_json()['data'][1]) is str
+    assert type(rv.get_json()['data'][2]) is str
 def test_get_1000_candles(client):
     # TODO reset databases
     args = {
