@@ -257,9 +257,10 @@ paths:
                             lastId: '1087681340'
                             count: '1327223'
 
-  /availableMarkets:
+
+  /availableCurrencies:
     get:
-      summary: "Returns list of available markets"
+      summary: "Returns list of available currencies"
       parameters:
         - in: query
           name: exchange
@@ -268,7 +269,7 @@ paths:
           example: binance
       responses:
         '200':
-          description: list of available markets
+          description: list of available currencies
           content:
             application/json:
               schema:
@@ -280,15 +281,21 @@ paths:
                         type: string
               example:
                 data:
-                  - "ETH/BTC"
-                  - "LTC/BTC"
-                  - "BNB/BTC"
-                  - "NEO/BTC"
-                  - "QTUM/ETH"
-                  - "EOS/ETH"
-                  - "SNT/ETH"
-                  - "BNT/ETH"
-                  - "BCC/BTC"     
+                  - "TRXUP"
+                  - "SHIB"
+                  - "LRC"
+                  - "CTXC"
+                  - "GBP"
+                  - "UNIUP"
+                  - "USDC"
+                  - "MBOX"
+                  - "HBAR"
+                  - "COVER"
+                  - "BAL"
+                  - "XEM"
+                  - "STEEM"
+                  - "ZIL"  
+
 components:
   schemas:
     Candle:

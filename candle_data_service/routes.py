@@ -263,6 +263,20 @@ async def available_markets():
     markets = await ex.get_markets()
     await close_exchange_all()
     return {'data': markets}, 200
+
+@main_routes.route("/availableCurrencies", methods=["GET"])
+async def available_currencies():
+    ex = get_exchange(request.args['exchange'])
+    markets = await ex.get_markets()
+    await close_exchange_all()
+    pairs = set()
+    for pair in markets:
+        pair = pair.split("/")[0]
+        pairs.add(pair)
+    
+    markets = list(pairs)
+    return {'data': markets}, 200
+
 async def download_candles_data(request_data: model.DownloadCandlesRequest):
     async_reqs = []
     try:
