@@ -223,6 +223,20 @@ def test_available_markets(client):
     assert type(rv.get_json()['data'][0]) is str
     assert type(rv.get_json()['data'][1]) is str
     assert type(rv.get_json()['data'][2]) is str
+
+def test_available_currencies(client):
+    args = {
+        "exchange": "binance",
+    }
+    rv = client.get("/availableCurrencies", query_string=args)
+    currencies_set = set(rv.get_json()['data'])
+    assert "200" in rv.status
+    assert type(rv.get_json()['data'][0]) is str
+    assert type(rv.get_json()['data'][1]) is str
+    assert type(rv.get_json()['data'][2]) is str
+    assert len(rv.get_json()['data']) == len(currencies_set)
+
+    
 def test_get_1000_candles(client):
     # TODO reset databases
     args = {
