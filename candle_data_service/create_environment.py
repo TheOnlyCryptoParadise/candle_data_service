@@ -64,7 +64,8 @@ if __name__ == "__main__":
         load_dotenv(path.join(basedir, '.dev.env'))
         
     attempt_cnt = 0
-    while attempt_cnt < 30:
+    connected = False
+    while attempt_cnt < 30 and connected == False:
         try:
             conn = mariadb.connect(
                     host=environ.get('MARIADB_HOST'),
@@ -72,11 +73,13 @@ if __name__ == "__main__":
                     user=environ.get('MARIADB_USER'),
                     password=environ.get('MARIADB_PASSWORD'),
                     database=environ.get('MARIADB_DB_NAME'))
-        except mariadb.OperationalError:
+            connected = True
+        except mariadb.Error:
             print(f"connection attempt {attempt_cnt} failed...retrying in 10s")
             attempt_cnt +=1
             time.sleep(10)
     print("connected to database")
+
 
 # cursor.execute("SELECT id FROM currency_pairs WHERE ticker='BTC_USDT'") # TODO hardcoded binance
 # exchange_id = None
