@@ -42,7 +42,7 @@ class RabbitWrapper:
                 self.channel.basic_publish(
                     exchange=self.exchange_name,
                     routing_key=routing_key,
-                    body=str(candle),
+                    body=candle.SerializeToString(),
                 )
 
 def get_candle_q():

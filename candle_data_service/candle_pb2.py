@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x63\x61ndle.proto\x12\x08tutorial\"\x91\x01\n\x06\x43\x61ndle\x12\x10\n\x08\x65xchange\x18\x01 \x02(\t\x12\x0c\n\x04pair\x18\x02 \x02(\t\x12\x0c\n\x04size\x18\x03 \x02(\t\x12\x0c\n\x04open\x18\x04 \x02(\x01\x12\x0c\n\x04high\x18\x05 \x02(\x01\x12\x0b\n\x03low\x18\x06 \x02(\x01\x12\r\n\x05\x63lose\x18\x07 \x02(\x01\x12\x0e\n\x06volume\x18\x08 \x02(\x01\x12\x11\n\ttimestamp\x18\t \x02(\x03')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x63\x61ndle.proto\x12\x07\x63\x61ndles\"\x91\x01\n\x06\x43\x61ndle\x12\x10\n\x08\x65xchange\x18\x01 \x01(\t\x12\x0c\n\x04pair\x18\x02 \x01(\t\x12\x0c\n\x04size\x18\x03 \x01(\t\x12\x0c\n\x04open\x18\x04 \x01(\x01\x12\x0c\n\x04high\x18\x05 \x01(\x01\x12\x0b\n\x03low\x18\x06 \x01(\x01\x12\r\n\x05\x63lose\x18\x07 \x01(\x01\x12\x0e\n\x06volume\x18\x08 \x01(\x01\x12\x11\n\ttimestamp\x18\t \x01(\x03\x62\x06proto3')
 
 
 
@@ -22,13 +22,13 @@ _CANDLE = DESCRIPTOR.message_types_by_name['Candle']
 Candle = _reflection.GeneratedProtocolMessageType('Candle', (_message.Message,), {
   'DESCRIPTOR' : _CANDLE,
   '__module__' : 'candle_pb2'
-  # @@protoc_insertion_point(class_scope:tutorial.Candle)
+  # @@protoc_insertion_point(class_scope:candles.Candle)
   })
 _sym_db.RegisterMessage(Candle)
 
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _CANDLE._serialized_start=27
-  _CANDLE._serialized_end=172
+  _CANDLE._serialized_start=26
+  _CANDLE._serialized_end=171
 # @@protoc_insertion_point(module_scope)

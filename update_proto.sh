@@ -1,0 +1,1 @@
+protoc -I"../protos/candles" --python_out=candle_data_service ../protos/candles/candle.proto
