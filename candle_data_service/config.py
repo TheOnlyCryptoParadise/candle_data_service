@@ -27,7 +27,9 @@ dictConfig(
 
             "werkzeug": {"level": "INFO"},
             "route_logger": {"level": "DEBUG"},
-            "candle_data_service.candleDAO" : {"level": "INFO" }
+            "candle_data_service.candleDAO" : {"level": "INFO" },
+            "candle_data_service.CandlePeriodicDownloader" : {"level": "DEBUG" },
+            "candle_data_service.RabbitWrapper" : {"level": "DEBUG" }
         },
     }
 )
@@ -58,7 +60,7 @@ MARIADB_PORT=environ.get('MARIADB_PORT')
 MARIADB_USER=environ.get('MARIADB_USER')
 MARIADB_PASSWORD=environ.get('MARIADB_PASSWORD')
 MARIADB_DB_NAME=environ.get('MARIADB_DB_NAME')
-
+RABBIT_HOSTNAME=environ.get("RABBIT_HOSTNAME")
 
 #TESTING = True
 #DEBUG = True
