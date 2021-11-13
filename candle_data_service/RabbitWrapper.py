@@ -16,7 +16,7 @@ class RabbitWrapper:
         )
         self.channel = self.connection.channel()
         self.logger = logging.getLogger(__name__)
-        self.exchange_name = "candles"
+        self.exchange_name = current_app.config["RABBIT_CANDLES_EXCHANGE_NAME"]
         self.exchange = self.channel.exchange_declare(self.exchange_name, "direct")
 
     def publish_candles(self, candle_data):

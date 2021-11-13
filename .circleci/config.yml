@@ -47,6 +47,7 @@ jobs:
           MYSQL_USER: test   
           MYSQL_PASSWORD: test
           MYSQL_DATABASE: candle_data_service
+      - image: rabbitmq:3.9
         
     # Checkout the code as the first step. This is a dedicated CircleCI step.
     # The python orb's install-packages step will install the dependencies from a Pipfile via Pipenv by default.
