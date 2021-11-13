@@ -29,7 +29,7 @@ dictConfig(
             "route_logger": {"level": "DEBUG"},
             "candle_data_service.candleDAO" : {"level": "INFO" },
             "candle_data_service.CandlePeriodicDownloader" : {"level": "DEBUG" },
-            "candle_data_service.RabbitWrapper" : {"level": "DEBUG" }
+            "candle_data_service.RabbitWrapper" : {"level": "INFO" }
         },
     }
 )

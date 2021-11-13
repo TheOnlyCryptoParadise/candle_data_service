@@ -53,6 +53,15 @@ def bad_request_handler(e):
     # return "bad request!", 400
     return str(e), 400
 
+# @main_routes.errorhandler(ValueError)
+# def bad_request_handler(e):
+#     # return "bad request!", 400
+#     return str(e), 400
+
+# @main_routes.errorhandler(KeyError)
+# def bad_request_handler(e):
+#     # return "bad request!", 400
+#     return str(e), 400
 
 
 @main_routes.errorhandler(botocore.exceptions.ClientError)
@@ -73,6 +82,18 @@ def get_settings():
     settings = CandlePeriodicDownloader.dw.download_settings
 
     return settings.dict(), 200
+
+@main_routes.route("/subscribeCandles", methods=["POST"])
+def subscribe_candles():
+    dw = CandlePeriodicDownloader.dw
+    dw.addSubscriber(request.get_json())
+    return {"result": 200, "msg": "OK"}
+
+@main_routes.route("/unsubscribeCandles", methods=["POST"])
+def unsubscribe_candles():
+    dw = CandlePeriodicDownloader.dw
+    dw.removeSubscriber(request.get_json())
+    return {"result": 200, "msg": "OK"}
 
 
 @main_routes.route("/downloadSettings", methods=["PUT"])

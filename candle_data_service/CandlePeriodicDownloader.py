@@ -28,6 +28,8 @@ class CandlePeriodicDownloader():
         self.time_interval = time_interval
         self.download_settings = download_settings
         self.logger = logging.getLogger(__name__)
+        
+        
 
         # self.logger.setLevel(logging.DEBUG) # TODO
         # sh = logging.StreamHandler()
@@ -39,6 +41,8 @@ class CandlePeriodicDownloader():
         self.time_interval_lock = threading.Lock()
         self.settings_lock = threading.Lock()
         self.exs_objs = {}
+        self.reference_counters = {}
+        self._ref_cnt_from_settings(download_settings)
         self.main_loop_thread = threading.Thread(target=self.main_loop, daemon=True)
         self.main_loop_thread.start()
         # self.main_loop()
@@ -88,14 +92,80 @@ class CandlePeriodicDownloader():
             await ex.close()
 
     def set_time_interval(self, time_interval):
-        self.time_interval_lock.acquire()
-        self.time_interval = time_interval
-        self.time_interval_lock.release()        
+        try:
+            self.time_interval_lock.acquire()
+            self.time_interval = time_interval
+        finally:
+            self.settings_lock.release()      
 
     def set_settings(self, download_settings: DownloadSettings):
-        self.time_interval_lock.acquire()
-        self.download_settings = download_settings
-        self.time_interval_lock.release()
+        try:
+            self.settings_lock.acquire()
+            self.download_settings = download_settings
+        finally:
+            self.settings_lock.release()
+
+    def addSubscriber(self, sub_setting):
+        try:
+            self.settings_lock.acquire()
+
+            self.logger.info("add subscriber")
+            settings = sub_setting["exchanges"]
+            for ex in settings.keys():
+                for c_size in settings[ex].keys():
+                    for pair in settings[ex][c_size]:
+                        self.logger.debug(f"add subscription for pair {pair}{c_size} in {ex}")
+                        if not c_size in self.download_settings.exchanges[ex]:
+                            self.download_settings.exchanges[ex][c_size] = []
+                        if not pair in self.download_settings.exchanges[ex][c_size]:
+                            self.download_settings.exchanges[ex][c_size].append(pair)
+
+                        record_id = self._id_from_candle_setting(ex,pair,c_size)
+                        if not record_id in self.reference_counters:
+                            self.reference_counters[record_id] = 1
+                        else:
+                            self.reference_counters[record_id] += 1
+
+
+
+        finally:
+            self.settings_lock.release()
+
+    def removeSubscriber(self, sub_setting):
+        try:
+            self.settings_lock.acquire()
+            
+            self.logger.info("remove subscriber")
+            settings = sub_setting['exchanges']
+
+            for ex in settings.keys():
+                for c_size in settings[ex].keys():
+                    for pair in settings[ex][c_size]:
+                        record_id = self._id_from_candle_setting(ex,pair,c_size)
+                        if not record_id in self.reference_counters or self.reference_counters[record_id] == 0:
+                            raise ValueError("no subscription for that candle")
+                        self.reference_counters[record_id] -= 1
+                        
+                        if self.reference_counters[record_id] == 0:
+                            self.download_settings.exchanges[ex][c_size].remove(pair)
+        finally:
+            self.settings_lock.release()
+
+
+    def _ref_cnt_from_settings(self, settings):
+        try:
+            self.settings_lock.acquire()
+            self.logger.info("setting reference_counters from settings")
+            settings = dict(settings)
+            for ex in settings.keys():
+                for c_size in settings[ex].keys():
+                    for pair in settings[ex][c_size]:
+                        self.reference_counters[self._id_from_candle_setting(ex,pair,c_size)] = 1
+        finally:
+            self.settings_lock.release()
+
+    def _id_from_candle_setting(self, ex, pair, c_size):
+        return ex + "_" + pair + "_" + c_size
 
     def init_exchanges(self):
         self.time_interval_lock.acquire()
