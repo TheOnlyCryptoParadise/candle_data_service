@@ -16,6 +16,7 @@ import asyncio
 import math
 import logging
 import ccxt
+from . import CandlePeriodicDownloader
 from candle_data_service.exchange import (
     get_exchange,
     close_exchange_all,
@@ -66,17 +67,18 @@ def index():
     return "Hello, World!"
 
 
-@main_routes.route("/settings", methods=["GET"])
+@main_routes.route("/downloadSettings", methods=["GET"])
 def get_settings():
 
-    settings = get_settingsManager().get()
+    settings = CandlePeriodicDownloader.dw.download_settings
 
-    return settings.dict()
+    return settings.dict(), 200
 
 
-@main_routes.route("/settings", methods=["PUT"])
+@main_routes.route("/downloadSettings", methods=["PUT"])
 def put_settings():
-    get_settingsManager().set_dict_settings(request.get_json())
+    settings = CandlePeriodicDownloader.DownloadSettings(**request.get_json())
+    CandlePeriodicDownloader.dw.set_settings(settings)
     return {"result": 200, "msg": "OK"}
 
 

@@ -330,3 +330,13 @@ def get_candleDAO():
         assert candleDAO != None, "no candleDAO configured"
         g.candleDAO = candleDAO
     return g.candleDAO
+
+def get_candleDAO_no_g():
+    candleDAO = None
+    if current_app.config["DATA_SOURCE_PROVIDER"] == "DynamoDB":
+        db = DynamoDb()  # TODO no need to create on every request
+        candleDAO = DynamoDbCandleDAO(db)
+    elif current_app.config["DATA_SOURCE_PROVIDER"] == "MariaDB":
+        candleDAO = MariaDBCandleDAO()
+    assert candleDAO != None, "no candleDAO configured"
+    return candleDAO

@@ -93,6 +93,19 @@ def get_exchange(exchange_name) -> ExchangeInterface:
         
     return g.exchanges[exchange_name]
     
+def candle_size_to_seconds(cs):
+    num = int(cs[:-1])
+    s = cs[-1]
+    if s == "m":
+        return num * 60
+    elif s == "h":
+        return num * 3600
+    elif s == "d":
+        return num * 3600 * 24
+    elif s == "w":
+        return num * 3600 * 24 * 7
+    elif s == "M":
+        return num * 3600 * 24 * 30
 
 async def close_exchange_all(e=None):
     exchanges = g.pop("exchanges", None)

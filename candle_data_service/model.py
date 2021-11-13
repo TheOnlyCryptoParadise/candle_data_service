@@ -8,6 +8,9 @@ class Exchange(BaseModel):
     name: str
     ticker_settings: Dict[str, List[str]]
 
+class DownloadSettingsRequest(BaseModel):
+    exchanges: Dict[str, Dict[str, List[str]]]
+
 class CandlesRequest(BaseModel):
     exchange: str
     currency_pair: str

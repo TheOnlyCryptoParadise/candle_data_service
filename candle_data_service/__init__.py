@@ -4,6 +4,7 @@ import os
 
 
 
+
 def create_app(test_config=None):
     """Create and configure an instance of the Flask application."""
     app = Flask(__name__, instance_relative_config=False)
@@ -12,6 +13,9 @@ def create_app(test_config=None):
     if test_config is not None:
         app.config.update(test_config)
 
+    with app.app_context():
+        from .CandlePeriodicDownloader import CandlePeriodicDownloader, DownloadSettings
+     
 
     
 
