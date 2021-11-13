@@ -11,3 +11,4 @@ pika==1.2.0
 protobuf==3.19.1
 python-dotenv==0.19.2
 flask[async]
+pika==1.2.0
