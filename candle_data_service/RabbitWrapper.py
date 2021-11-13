@@ -24,7 +24,7 @@ class RabbitWrapper:
             pair = candle_record[0]
             candle_size = candle_record[1]
             candles = candle_record[2]
-            self.logger.info(f"put {len(candles)} candles for {pair}{candle_size} to exchange")
+            self.logger.info(f"put {len(candles)} candles for {pair}{candle_size} to MQexchange")
             routing_key = pair.replace("/", "_") + "_" + candle_size
             for c in candles:
                 candle = Candle(
