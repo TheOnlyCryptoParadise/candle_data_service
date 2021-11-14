@@ -12,6 +12,7 @@ services:
       FLASK_ENV: development
       FLASK_APP: candle_data_service
       DATA_SOURCE_PROVIDER: MariaDB
+      RABBIT_HOSTNAME: rabbit
       DYNAMODB_ENDPOINT_URL: "http://localstack:4566"
       MARIADB_HOST: sql-db
     entrypoint: ['sh', '-c']

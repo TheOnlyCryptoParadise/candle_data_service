@@ -10,6 +10,7 @@ from .candleDAO import get_candleDAO_no_g
 import time
 import logging
 from flask import Blueprint
+import ccxt
 
 # example:
 #     ex = {
@@ -53,34 +54,37 @@ class CandlePeriodicDownloader():
         loops_cnt = 0
         try:
             while True:
-                self.logger.info("starting download loop")
-                start_time = time.time()
-                self.settings_lock.acquire()
-                self.logger.debug("settings lock acquaired")
-                
-                candles = self.loop.run_until_complete(self.async_download_coroutine(loops_cnt))
-                
-                end_time = time.time()
-                self.settings_lock.release()
-                self.logger.debug("settings lock released")
-                self.logger.debug(candles)
-                self.candle_DAO.put_candles(candles)
+                try:
+                    self.logger.info("starting download loop")
+                    start_time = time.time()
+                    self.settings_lock.acquire()
+                    self.logger.debug("settings lock acquaired")
+                    
+                    candles = self.loop.run_until_complete(self.async_download_coroutine(loops_cnt))
+                    
+                    end_time = time.time()
+                    self.settings_lock.release()
+                    self.logger.debug("settings lock released")
+                    self.logger.debug(candles)
+                    self.candle_DAO.put_candles(candles)
 
-                self.candle_q.publish_candles(candles)
+                    self.candle_q.publish_candles(candles)
 
-                self.logger.info("download loop ended")
-                
-                execution_time =  (end_time - start_time)
-                self.logger.info(f"execution took {execution_time}s")
-                
-                self.time_interval_lock.acquire()
-                current_time_interval = self.time_interval
-                self.time_interval_lock.release()
-                
-                loops_cnt +=1
-                
-                if current_time_interval > execution_time:
-                    time.sleep(current_time_interval - execution_time)
+                    self.logger.info("download loop ended")
+                    
+                    execution_time =  (end_time - start_time)
+                    self.logger.info(f"execution took {execution_time}s")
+                    
+                    self.time_interval_lock.acquire()
+                    current_time_interval = self.time_interval
+                    self.time_interval_lock.release()
+                    
+                    loops_cnt +=1
+                    
+                    if current_time_interval > execution_time:
+                        time.sleep(current_time_interval - execution_time)
+                except ccxt.RequestTimeout as e:
+                    self.logger.warning("ccxt request timeout")
 
         except KeyboardInterrupt:
             self.loop.run_until_complete(self.close_all_exchanges())
