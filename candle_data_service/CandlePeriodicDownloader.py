@@ -10,6 +10,7 @@ from .candleDAO import get_candleDAO_no_g
 import time
 import logging
 from flask import Blueprint
+import ccxt
 
 # example:
 #     ex = {
