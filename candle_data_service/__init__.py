@@ -3,6 +3,8 @@ from flask_cors import CORS
 import os
 
 
+from .CandlePeriodicDownloader import CandlePeriodicDownloader, DownloadSettings
+
 
 
 def create_app(test_config=None):
@@ -14,8 +16,7 @@ def create_app(test_config=None):
         app.config.update(test_config)
 
     with app.app_context():
-        from .CandlePeriodicDownloader import CandlePeriodicDownloader, DownloadSettings
-     
+        CandlePeriodicDownloader()
 
     
 

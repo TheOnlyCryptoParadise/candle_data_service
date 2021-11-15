@@ -10,7 +10,8 @@ import json
 import logging
 import time
 import mariadb
-
+from tenacity import retry, wait_fixed, stop_after_delay
+import traceback
 
 class CandleDAO(ABC):
     @abstractmethod
@@ -159,14 +160,40 @@ class MariaDBCandleDAO(CandleDAO):
         # sh.setLevel(logging.DEBUG)
         # self.logger.addHandler(sh)
         self.logger.debug("MariDB instantiated")
-        self.conn = mariadb.connect(
-            host=current_app.config["MARIADB_HOST"],
-            port=int(current_app.config["MARIADB_PORT"]),
-            user=current_app.config["MARIADB_USER"],
-            password=current_app.config["MARIADB_PASSWORD"],
-            database=current_app.config["MARIADB_DB_NAME"],
-        )
+        self.mariadb_host = current_app.config["MARIADB_HOST"]
+        self.mariadb_port = int(current_app.config["MARIADB_PORT"])
+        self.mariadb_user = current_app.config["MARIADB_USER"]
+        self.mariadb_password = current_app.config["MARIADB_PASSWORD"]
+        self.mariadb_db = current_app.config["MARIADB_DB_NAME"]
+        self._connect_to_db()
 
+    @retry(wait=wait_fixed(8), stop=stop_after_delay(60))
+    def _connect_to_db(self):
+        try:
+            self.logger.info("trying to connect to mariadb...")
+            self.conn = mariadb.connect(
+                host=self.mariadb_host,
+                port=self.mariadb_port,
+                user=self.mariadb_user,
+                password=self.mariadb_password,
+                database=self.mariadb_db,
+            )
+            self.logger.info("connected to mariadb")
+        except Exception as e:
+            self.logger.error(f"mariadb connection error: {str(e)}")
+            traceback.print_exc()
+
+            raise e
+    def with_try_except(foo):
+        def inner(self, *args,**kwargs):
+            try:
+                return foo(self, *args,**kwargs)
+            except mariadb.Error as e:
+                self.logger.error(f"mariadb error: {str(e)}")
+                self._connect_to_db()
+        return inner
+
+    @with_try_except
     def get_candles(self, request: model.CandlesRequest) -> List[model.Candle]:
         # TODO add exchange in name of table
         # table_name = request.exchange + "_" + request.currency_pair.replace("/","_") + "_" + request.candle_size
@@ -225,7 +252,7 @@ class MariaDBCandleDAO(CandleDAO):
         cursor.close()
         self.logger.info(f"returning {len(response)} candles")
         return response        
-
+    @with_try_except
     def put_candles(self, candle_data):
         cursor = self.conn.cursor()
         for candle_record in candle_data:
@@ -277,13 +304,13 @@ class MariaDBCandleDAO(CandleDAO):
 
         cursor.close()
         self.conn.commit()
-
+    @with_try_except
     def _create_currency_pair(self, name, cursor):
         self.logger.info("create currency_pair %s", name)
         cursor.execute("INSERT INTO currency_pairs (ticker) VALUES (?)", (name,))
         return cursor.lastrowid
 
-
+    @with_try_except
     def get_available_data(self):
         cursor = self.conn.cursor()
 

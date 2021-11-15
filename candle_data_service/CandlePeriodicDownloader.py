@@ -3,7 +3,7 @@ import threading
 import pydantic
 from typing import Dict, Tuple, List
 import asyncio
-
+import ccxt
 from candle_data_service.RabbitWrapper import get_candle_q
 from .exchange import ExchangeInterface, candle_size_to_seconds
 from .candleDAO import get_candleDAO_no_g
@@ -20,13 +20,35 @@ import ccxt
 #             ]
 #         }
 #     }
+
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
 class DownloadSettings(pydantic.BaseModel):
     exchanges: Dict[str, Dict[str, List[str]]]
 
 
-class CandlePeriodicDownloader():
-    def __init__(self, time_interval, download_settings: DownloadSettings):
+class CandlePeriodicDownloader(metaclass=Singleton):
+    def __init__(self, download_settings: DownloadSettings = None,  time_interval=60):
         self.time_interval = time_interval
+        if download_settings == None:
+           download_settings = DownloadSettings(exchanges={
+                "binance": {
+                    "1m": [
+                        "BTC/USDT",
+                        "LINK/USDT"
+                    ],
+                    "5m": [
+                        "ETH/USDT",
+                        "DOT/USDT"
+                    ]
+                }
+            })
         self.download_settings = download_settings
         self.logger = logging.getLogger(__name__)
         
@@ -84,8 +106,7 @@ class CandlePeriodicDownloader():
                     if current_time_interval > execution_time:
                         time.sleep(current_time_interval - execution_time)
                 except ccxt.RequestTimeout as e:
-                    self.logger.warning("ccxt request timeout")
-
+                    self.logger.warning("ccxt to exchagne - request timeout")
         except KeyboardInterrupt:
             self.loop.run_until_complete(self.close_all_exchanges())
             self.loop.close()
@@ -213,18 +234,8 @@ class CandlePeriodicDownloader():
 
 # candles_periodic_downloader = Blueprint("candles_periodic_downloader", "candles_periodic_downloader")
 # dw = CandlePeriodicDownloader(60, DownloadSettings(exs={}))
-dw = CandlePeriodicDownloader(60, DownloadSettings(exchanges={
-    "binance": {
-        "1m": [
-            "BTC/USDT",
-            "LINK/USDT"
-        ],
-        "5m": [
-            "ETH/USDT",
-            "DOT/USDT"
-        ]
-    }
-}))
+
+# dw = CandlePeriodicDownloader(60, DownloadSettings(exchanges=))
 
 
 if __name__ == '__main__':
