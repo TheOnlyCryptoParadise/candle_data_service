@@ -16,7 +16,7 @@ import asyncio
 import math
 import logging
 import ccxt
-from . import CandlePeriodicDownloader
+from .CandlePeriodicDownloader import CandlePeriodicDownloader, DownloadSettings
 from candle_data_service.exchange import (
     get_exchange,
     close_exchange_all,
@@ -78,28 +78,30 @@ def index():
 
 @main_routes.route("/downloadSettings", methods=["GET"])
 def get_settings():
+    dw = CandlePeriodicDownloader()
 
-    settings = CandlePeriodicDownloader.dw.download_settings
+    settings = dw.download_settings
 
     return settings.dict(), 200
 
 @main_routes.route("/subscribeCandles", methods=["POST"])
 def subscribe_candles():
-    dw = CandlePeriodicDownloader.dw
+    dw = CandlePeriodicDownloader()
     dw.addSubscriber(request.get_json())
     return {"result": 200, "msg": "OK"}
 
 @main_routes.route("/unsubscribeCandles", methods=["POST"])
 def unsubscribe_candles():
-    dw = CandlePeriodicDownloader.dw
+    dw = CandlePeriodicDownloader()
     dw.removeSubscriber(request.get_json())
     return {"result": 200, "msg": "OK"}
 
 
 @main_routes.route("/downloadSettings", methods=["PUT"])
 def put_settings():
-    settings = CandlePeriodicDownloader.DownloadSettings(**request.get_json())
-    CandlePeriodicDownloader.dw.set_settings(settings)
+    settings = DownloadSettings(**request.get_json())
+    dw = CandlePeriodicDownloader()
+    dw.set_settings(settings)
     return {"result": 200, "msg": "OK"}
 
 

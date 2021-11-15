@@ -3,36 +3,44 @@ from os import environ, path
 from dotenv import load_dotenv
 from logging.config import dictConfig
 import logging
+import yaml
 
-dictConfig(
-    {
-        "version": 1,
-        "formatters": {
-            "default": {
-                "format": "[%(asctime)s]:%(name)s:%(module)s:%(levelname)s: %(message)s",
-            }
-        },
-        "handlers": {
-            "wsgi": {
-                "class": "logging.StreamHandler",
-                "stream": "ext://sys.stdout",
-                "formatter": "default",
-            }
-        },
-        'root': {
-            'level': 'INFO',
-            'handlers': ['wsgi']
-        },        
-        "loggers": {
+try:
+    with open("logging_config.yml") as log_config_file:
+        log_config = yaml.safe_load(log_config_file)
+        dictConfig(log_config)
+        logging.getLogger().info("from file logging configuration")
+except FileNotFoundError as e:
+    dictConfig(
+        {
+            "version": 1,
+            "formatters": {
+                "default": {
+                    "format": "[%(asctime)s]:%(name)s:%(module)s:%(levelname)s: %(message)s",
+                }
+            },
+            "handlers": {
+                "wsgi": {
+                    "class": "logging.StreamHandler",
+                    "stream": "ext://sys.stdout",
+                    "formatter": "default",
+                }
+            },
+            'root': {
+                'level': 'INFO',
+                'handlers': ['wsgi']
+            },        
+            "loggers": {
 
-            "werkzeug": {"level": "INFO"},
-            "route_logger": {"level": "DEBUG"},
-            "candle_data_service.candleDAO" : {"level": "INFO" },
-            "candle_data_service.CandlePeriodicDownloader" : {"level": "DEBUG" },
-            "candle_data_service.RabbitWrapper" : {"level": "INFO" }
-        },
-    }
-)
+                "werkzeug": {"level": "INFO"},
+                "route_logger": {"level": "DEBUG"},
+                "candle_data_service.candleDAO" : {"level": "INFO" },
+                "candle_data_service.CandlePeriodicDownloader" : {"level": "DEBUG" },
+                "candle_data_service.RabbitWrapper" : {"level": "INFO" }
+            },
+        }
+    )
+    logging.getLogger().info("default logging configuration")
 
 
 FLASK_ENV = environ.get('FLASK_ENV', 'development')

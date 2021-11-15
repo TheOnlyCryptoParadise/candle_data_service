@@ -6,6 +6,8 @@ services:
       - localstack-net
     ports:
       - "5000:8080"
+    volumes:
+      - "./logging_config.yml:/app/logging_config.yml"
     environment:
       AWS_ACCESS_KEY_ID: test
       AWS_SECRET_ACCESS_KEY: test
@@ -14,6 +16,7 @@ services:
       DATA_SOURCE_PROVIDER: MariaDB
       DYNAMODB_ENDPOINT_URL: "http://localstack:4566"
       MARIADB_HOST: sql-db
+      RABBIT_HOSTNAME: rabbit
     entrypoint: ['sh', '-c']
     command: "'python create_environment.py && waitress-serve --call candle_data_service:create_app'"
 
