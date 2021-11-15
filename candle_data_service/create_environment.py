@@ -67,6 +67,7 @@ if __name__ == "__main__":
     connected = False
     while attempt_cnt < 30 and connected == False:
         try:
+            print("connecting to database...")
             conn = mariadb.connect(
                     host=environ.get('MARIADB_HOST'),
                     port=int(environ.get('MARIADB_PORT')),

@@ -7,7 +7,7 @@ services:
     ports:
       - "5000:8080"
     volumes:
-      - "./logging_config.yml:/app/logging_config.yml"
+      - "./configs/logging_config.yml:/app/configs/logging_config.yml"
     environment:
       AWS_ACCESS_KEY_ID: test
       AWS_SECRET_ACCESS_KEY: test
