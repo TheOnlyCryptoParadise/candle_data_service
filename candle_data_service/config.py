@@ -6,7 +6,7 @@ import logging
 import yaml
 
 try:
-    with open("logging_config.yml") as log_config_file:
+    with open("configs/logging_config.yml") as log_config_file:
         log_config = yaml.safe_load(log_config_file)
         dictConfig(log_config)
         logging.getLogger().info("from file logging configuration")
