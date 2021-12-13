@@ -6,6 +6,8 @@ import mariadb
 from os import environ, path
 from dotenv import load_dotenv
 
+from candle_data_service import config
+
 import argparse
 # done = False
 # fail_counter = 0
@@ -56,24 +58,18 @@ def delete_tables(conn):
 
 
 if __name__ == "__main__":
-    basedir = path.abspath(path.dirname(__file__))
-    load_dotenv(path.join(basedir, '.main.env'))
-    FLASK_ENV = environ.get('FLASK_ENV', 'development')
 
-    if FLASK_ENV == 'development':
-        load_dotenv(path.join(basedir, '.dev.env'))
-        
     attempt_cnt = 0
     connected = False
-    while attempt_cnt < 30 and connected == False:
+    while attempt_cnt < int(config.DB_CONNECTION_ATTEMPTS) and connected == False:
         try:
             print("connecting to database...")
             conn = mariadb.connect(
-                    host=environ.get('MARIADB_HOST'),
-                    port=int(environ.get('MARIADB_PORT')),
-                    user=environ.get('MARIADB_USER'),
-                    password=environ.get('MARIADB_PASSWORD'),
-                    database=environ.get('MARIADB_DB_NAME'))
+                host=config.MARIADB_HOST,
+                port=int(config.MARIADB_PORT),
+                user=config.MARIADB_USER,
+                password=config.MARIADB_PASSWORD,
+                database=config.MARIADB_DB_NAME)
             connected = True
         except mariadb.Error:
             print(f"connection attempt {attempt_cnt} failed...retrying in 10s")
