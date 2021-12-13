@@ -124,6 +124,7 @@ def _candle_size_to_seconds(cs):
 async def get_candles():
     options = model.CandlesRequest(**request.args)
     options.currency_pair = options.currency_pair.replace("_", "/")
+    route_logger.debug(options)
     try:
         
         candleDAO = get_candleDAO()
@@ -139,8 +140,11 @@ async def get_candles():
                 candle_in_sec = _candle_size_to_seconds(options.candle_size)
                 route_logger.debug(available[0])
                 if options.last_n_candles != None:
-                    now = datetime.utcnow().timestamp()
+                    now = datetime.now().timestamp()
                     delta = now - current_time_end # TODO not only 0
+                    print(delta)
+                    print(now)
+                    print(current_time_end)
                     if current_no_candles < options.last_n_candles:
                         request_data = model.DownloadCandlesRequest(
                             exchanges=[

@@ -209,7 +209,7 @@ class MariaDBCandleDAO(CandleDAO):
                 FROM candles c
                     INNER join currency_pairs cp on cp.id = c.currency_pair
                 WHERE cp.ticker = ?
-                    and c.candle_size = ? order by timestamp asc limit ?;
+                    and c.candle_size = ? order by timestamp desc limit ?;
                 """
         query_timestamps = """SELECT c.timestamp,
                     cp.ticker,
@@ -230,14 +230,16 @@ class MariaDBCandleDAO(CandleDAO):
 
         response = None
         if request.time_start and request.time_end:
-            cursor.execute(query_timestamps, (request.time_start, request.time_end, request.currency_pair, request.candle_size))
             self.logger.info(f"requested: {request.currency_pair} {request.candle_size} from{request.time_start} to{request.time_end}")
+            cursor.execute(query_timestamps, (request.time_start, request.time_end, request.currency_pair, request.candle_size))
+            response = cursor.fetchall()
         elif request.last_n_candles:
             self.logger.info(f"requested: {request.currency_pair} {request.candle_size} {request.last_n_candles} candles")
             cursor.execute(query_last_n_candles, (request.currency_pair, request.candle_size, request.last_n_candles))
+            response = list(cursor.fetchall())
+            response.reverse()
         else:
             raise ValueError("wrong request")
-        response = cursor.fetchall()
         response = [
             model.Candle(
                 open=r[3],
