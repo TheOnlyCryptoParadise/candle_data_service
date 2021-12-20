@@ -88,7 +88,7 @@ class CandlePeriodicDownloader(metaclass=Singleton):
                     self.settings_lock.release()
                     self.logger.debug("settings lock released")
                     self.logger.debug(candles)
-                    self.candle_DAO.put_candles(candles)
+                    # self.candle_DAO.put_candles(candles) HOTFIX
 
                     self.candle_q.publish_candles(candles)
 
