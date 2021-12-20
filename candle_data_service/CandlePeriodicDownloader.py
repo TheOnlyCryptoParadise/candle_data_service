@@ -41,11 +41,11 @@ class CandlePeriodicDownloader(metaclass=Singleton):
                 "binance": {
                     "1m": [
                         "BTC/USDT",
-                        "LINK/USDT"
+                        # "LINK/USDT"
                     ],
                     "5m": [
-                        "ETH/USDT",
-                        "DOT/USDT"
+                        # "ETH/USDT",
+                        # "DOT/USDT"
                     ]
                 }
             })

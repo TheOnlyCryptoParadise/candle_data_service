@@ -2,7 +2,7 @@ from asyncio.tasks import current_task
 import json
 import re
 from candle_data_service import model
-from flask import request
+from flask import request, g
 from candle_data_service import exchange
 from candle_data_service import candleDAO
 from candle_data_service.candleDAO import get_candleDAO
@@ -346,3 +346,9 @@ async def download_candles_data(request_data: model.DownloadCandlesRequest):
     finally:
         await close_exchange_all()
 
+
+@main_routes.after_request
+def after_request(response):
+    if "candleDAO" in g:
+        g.candleDAO.conn.close()
+    return response
