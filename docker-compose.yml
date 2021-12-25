@@ -17,8 +17,8 @@ services:
       DYNAMODB_ENDPOINT_URL: "http://localstack:4566"
       MARIADB_HOST: sql-db
       RABBIT_HOSTNAME: rabbit
-    entrypoint: ['sh', '-c']
-    command: "'python create_environment.py && waitress-serve --call candle_data_service:create_app'"
+    # entrypoint: ['sh', '-c']
+    # command: "'python -u create_environment.py && waitress-serve --call candle_data_service:create_app'"
 
 networks:
   localstack-net:

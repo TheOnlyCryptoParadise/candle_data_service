@@ -20,6 +20,11 @@ COPY candle_data_service/.dev.env /app/
 COPY candle_data_service/.main.env /app/
 COPY candle_data_service/database_create.sql /app/
 
-ENTRYPOINT ["waitress-serve", "--call", "candle_data_service:create_app"]
+ENTRYPOINT ["sh", "-c"]
 
-# CMD [ "flask", "run" ]
+CMD [ "python -u create_environment.py && waitress-serve --call candle_data_service:create_app" ]
+
+# entrypoint: ['sh', '-c']
+# command: "'python -u create_environment.py && waitress-serve --call candle_data_service:create_app'"
+
+
