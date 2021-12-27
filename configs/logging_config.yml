@@ -22,12 +22,14 @@ loggers:
   werkzeug:
     level: INFO
   route_logger:
-    level: INFO
+    level: DEBUG
   candle_data_service.candleDAO:
     level: INFO
   candle_data_service.CandlePeriodicDownloader:
     level: INFO
   candle_data_service.RabbitWrapper:
-    level: INFO
+    level: WARNING
+  candle_data_service.exchange:
+    level: DEBUG
   pika.adapters:
     level: WARNING

@@ -298,12 +298,16 @@ class MariaDBCandleDAO(CandleDAO):
             self.logger.info(f"put {len(data_for_query)} records")
 
             #cursor.executemany(query, data_for_query) #TODO handle duplicate entries
+            itt = 0
+            dupl = 0
             for data in data_for_query:
                 try:
+                    itt+=1
                     cursor.execute(query, data)
                 except mariadb.IntegrityError:
-                    self.logger.info(f"duplicate key for {data}")
-
+                    dupl += 1
+                    self.logger.debug(f"duplicate key for {data}")
+            self.logger.info(f"put {itt} records with {dupl} duplicates")
         cursor.close()
         self.conn.commit()
     @with_try_except

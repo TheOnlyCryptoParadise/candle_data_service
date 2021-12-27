@@ -16,7 +16,7 @@ import asyncio
 class ExchangeInterface():
 
     def __init__(self, exchange_name):
-        self.logger = logging.getLogger().getChild(self.__class__.__name__)
+        self.logger = logging.getLogger().getChild(__name__)
 
         self.ccxt_exchange = getattr(ccxt, exchange_name)({
                 "enableRateLimit": True
@@ -45,28 +45,49 @@ class ExchangeInterface():
         Returns:
             list: Contains a list of lists which contain timestamp, open, high, low, close, volume.
         """
+        if max_periods > 10000:
+            self.logger.warning(f"you asked for: {max_periods} Are you insane!?")
         historical_data = None
         if start_date:
-            historical_data = await self.ccxt_exchange.fetch_ohlcv(
-            market_pair,
-            timeframe=time_unit,
-            since=int(start_date*1000),
-            limit=int(max_periods)
-            )
+            historical_data = []
+            since = start_date
+            while(max_periods > len(historical_data)):
+                current_limit = max_periods - len(historical_data)
+                if current_limit > 1000:
+                    current_limit = 1000
+                self.logger.debug(f"downloading {current_limit} candles at once")
+                historical_data.extend(await self.ccxt_exchange.fetch_ohlcv(
+                    market_pair,
+                    timeframe=time_unit,
+                    since=int(since*1000),
+                    limit=int(current_limit)
+                ))
+                since += candle_size_to_seconds(time_unit)*current_limit
         else:
-            historical_data = await self.ccxt_exchange.fetch_ohlcv(
-            market_pair,
-            timeframe=time_unit,
-            limit=int(max_periods)
-            )
+            historical_data = []
+            now = datetime.utcnow().timestamp()
+            since = now - candle_size_to_seconds(time_unit)*max_periods
+            while(max_periods > len(historical_data)):
+                current_limit = max_periods - len(historical_data)
+                if current_limit > 1000:
+                    current_limit = 1000
+                self.logger.debug(f"downloading {current_limit} candles at once")
+                historical_data.extend(await self.ccxt_exchange.fetch_ohlcv(
+                    market_pair,
+                    timeframe=time_unit,
+                    since=int(since*1000),
+                    limit=int(current_limit)
+                ))
+                since += candle_size_to_seconds(time_unit)*current_limit
 
         if not historical_data:
             raise ValueError(
                 'No historical data provided returned by exchange.')
-
         # Sort by timestamp in ascending order
         historical_data.sort(key=lambda d: d[0])
-
+        if len(historical_data) != max_periods:
+            self.logger.warning(f"downloaded data size is different from asked data {len(historical_data)} != {max_periods}")
+        self.logger.debug(f"downloaded {len(historical_data)} overall")
         await asyncio.sleep(self.ccxt_exchange.rateLimit / 1000)
 
         return (market_pair, time_unit, historical_data)

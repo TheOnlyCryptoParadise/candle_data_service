@@ -142,9 +142,7 @@ async def get_candles():
                 if options.last_n_candles != None:
                     now = datetime.now().timestamp()
                     delta = now - current_time_end # TODO not only 0
-                    print(delta)
-                    print(now)
-                    print(current_time_end)
+
                     if current_no_candles < options.last_n_candles:
                         request_data = model.DownloadCandlesRequest(
                             exchanges=[
@@ -175,9 +173,9 @@ async def get_candles():
 
 
                     time_start_delta = current_time_start - options.time_start
-                    time_end_delta = options.time_end - current_time_end
+                    time_end_delta = current_time_end - options.time_end
                     route_logger.debug(f"tsdelta{time_start_delta} te{time_end_delta/3600}")
-                    if time_start_delta > 1.0*candle_in_sec:
+                    if time_start_delta > 1.0*candle_in_sec and time_end_delta > 1.0*candle_in_sec:
                         request_data = model.DownloadCandlesRequest(
                             exchanges=[
                                 model.DownloadExchangeInfo(
@@ -190,7 +188,7 @@ async def get_candles():
                             time_end=current_time_start
                         )  
                         await download_candles_data(request_data)
-                    if time_end_delta > 1.0*candle_in_sec:
+                    elif time_start_delta < -1.0*candle_in_sec and time_end_delta < -1.0*candle_in_sec:
                         request_data = model.DownloadCandlesRequest(
                             exchanges=[
                                 model.DownloadExchangeInfo(
@@ -203,7 +201,46 @@ async def get_candles():
                             time_end=options.time_end
                         )  
                         await download_candles_data(request_data)
-
+                    elif time_start_delta > 1.0*candle_in_sec and time_end_delta < -1.0*candle_in_sec:
+                        request_data = model.DownloadCandlesRequest(
+                            exchanges=[
+                                model.DownloadExchangeInfo(
+                                    name=options.exchange,
+                                    pairs=[options.currency_pair],
+                                    candle_sizes=[options.candle_size],
+                                )
+                            ],
+                            time_start=options.time_start,
+                            time_end=current_time_end
+                        )  
+                        await download_candles_data(request_data)
+                        request_data = model.DownloadCandlesRequest(
+                            exchanges=[
+                                model.DownloadExchangeInfo(
+                                    name=options.exchange,
+                                    pairs=[options.currency_pair],
+                                    candle_sizes=[options.candle_size],
+                                )
+                            ],
+                            time_start=current_time_end,
+                            time_end=options.time_end
+                        )  
+                        await download_candles_data(request_data)
+                    elif time_start_delta < -1.0*candle_in_sec and time_end_delta < -1.0*candle_in_sec:
+                        request_data = model.DownloadCandlesRequest(
+                            exchanges=[
+                                model.DownloadExchangeInfo(
+                                    name=options.exchange,
+                                    pairs=[options.currency_pair],
+                                    candle_sizes=[options.candle_size],
+                                )
+                            ],
+                            time_start=current_time_end,
+                            time_end=options.time_end
+                        )  
+                        await download_candles_data(request_data)
+                    elif time_start_delta < -1.0*candle_in_sec and time_end_delta > 1.0*candle_in_sec:
+                        pass
             except KeyError:
                 route_logger.info("KeyError downloading all")
                 request_data = None
