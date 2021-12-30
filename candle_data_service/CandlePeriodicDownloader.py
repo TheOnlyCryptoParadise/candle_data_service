@@ -4,6 +4,7 @@ import pydantic
 from typing import Dict, Tuple, List
 import asyncio
 import ccxt
+from candle_data_service import config
 from candle_data_service.RabbitWrapper import get_candle_q
 from .exchange import ExchangeInterface, candle_size_to_seconds
 from .candleDAO import get_candleDAO_no_g
@@ -35,12 +36,14 @@ class DownloadSettings(pydantic.BaseModel):
 
 class CandlePeriodicDownloader(metaclass=Singleton):
     def __init__(self, download_settings: DownloadSettings = None,  time_interval=60):
+
+
         self.time_interval = time_interval
         if download_settings == None:
            download_settings = DownloadSettings(exchanges={
                 "binance": {
                     "1m": [
-                        "BTC/USDT",
+                        # "BTC/USDT",
                         # "LINK/USDT"
                     ],
                     "5m": [
@@ -51,8 +54,12 @@ class CandlePeriodicDownloader(metaclass=Singleton):
             })
         self.download_settings = download_settings
         self.logger = logging.getLogger(__name__)
-        
-        
+        self.time_interval_lock = threading.Lock()
+        self.settings_lock = threading.Lock()
+        self.exs_objs = {}
+        self.reference_counters = {}
+        if not config.PERIODIC_DOWNLOADER_ENABLED:
+            return
 
         # self.logger.setLevel(logging.DEBUG) # TODO
         # sh = logging.StreamHandler()
@@ -61,10 +68,6 @@ class CandlePeriodicDownloader(metaclass=Singleton):
         self.candle_q = get_candle_q()
 
         self.candle_DAO = get_candleDAO_no_g()
-        self.time_interval_lock = threading.Lock()
-        self.settings_lock = threading.Lock()
-        self.exs_objs = {}
-        self.reference_counters = {}
         self._ref_cnt_from_settings(download_settings)
         self.main_loop_thread = threading.Thread(target=self.main_loop, daemon=True)
         self.main_loop_thread.start()

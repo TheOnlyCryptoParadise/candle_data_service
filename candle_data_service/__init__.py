@@ -5,7 +5,7 @@ import os
 
 from .CandlePeriodicDownloader import CandlePeriodicDownloader, DownloadSettings
 
-
+from .KinesisPuller import KinesisPuller
 
 def create_app(test_config=None):
     """Create and configure an instance of the Flask application."""
@@ -17,6 +17,7 @@ def create_app(test_config=None):
 
     with app.app_context():
         CandlePeriodicDownloader()
+        KinesisPuller()
 
     
 

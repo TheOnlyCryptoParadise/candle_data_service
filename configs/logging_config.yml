@@ -31,5 +31,7 @@ loggers:
     level: WARNING
   candle_data_service.exchange:
     level: DEBUG
-  pika.adapters:
-    level: WARNING
+  candle_data_service.kinesis.consumer:
+    level: INFO
+  candle_data_service.KinesisPuller:
+    level: DEBUG

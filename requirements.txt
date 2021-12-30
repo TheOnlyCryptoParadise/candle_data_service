@@ -13,3 +13,4 @@ protobuf==3.19.1
 python-dotenv==0.19.2
 PyYAML==6.0
 flask[async]
+kinesis-python==0.2.1
